@@ -1,0 +1,414 @@
+# -*- coding: utf-8 -*-
+
+from resources.lib.tools import *
+
+import sys, os, stat, subprocess
+import time, datetime, random
+
+TIME_OFFSET = int(round((datetime.datetime.now() - datetime.datetime.utcnow()).seconds, -1))
+JSON_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+
+SHUTDOWN_CMD = xbmc.translatePath(os.path.join(PATH, 'resources', 'lib', 'shutdown.sh'))
+EXTGRABBER = xbmc.translatePath(os.path.join(PATH, 'resources', 'lib', 'epggrab_ext.sh'))
+
+modes = {'NONE': None, 'POWEROFF': 'poweroff', 'CHECKMAILSETTINGS': 'sendmail'}
+
+release = release()
+writeLog('OS ID is %s' % (release['osid']))
+
+if ('libreelec' or 'openelec') in release['osid'] and getAddonSetting('sudo', sType=BOOL):
+    xbmcaddon.Addon().setSetting('sudo', 'false')
+    writeLog('Reset wrong setting \'sudo\' to False')
+
+# set permissions for these files, required after installation or update
+
+_sts = os.stat(SHUTDOWN_CMD)
+_stg = os.stat(EXTGRABBER)
+if not (_sts.st_mode & stat.S_IEXEC): os.chmod(SHUTDOWN_CMD, _sts.st_mode | stat.S_IEXEC)
+if not (_stg.st_mode & stat.S_IEXEC): os.chmod(EXTGRABBER, _stg.st_mode | stat.S_IEXEC)
+
+CYCLE = 60  # polling cycle
+
+try:
+    dummy = datetime.datetime.strptime('1970-01-01', '%Y-%m-%d')
+except TypeError, e:
+    writeLog(e.message)
+
+# binary Flags
+
+isRES = 0b10000     # TVH PM has started by Resume on record/EPG
+isNET = 0b01000     # Network is active
+isPRG = 0b00100     # Programs/Processes are active
+isREC = 0b00010     # Recording is or becomes active
+isEPG = 0b00001     # EPG grabbing is active
+isUSR = 0b00000     # User is active
+
+class Manager(object):
+
+    def __init__(self):
+
+        self.wakeREC = None
+        self.wakeEPG = None
+        self.wakeUTC = None
+        self.__monitored_ports = ''
+        self.__recTitles = []
+
+        self.rndProcNum = random.randint(1, 1024)
+        self.hasPVR = None
+
+        # read addon settings
+        self.__sudo = 'sudo ' if getAddonSetting('sudo', sType=BOOL) else ''
+        self.__nextsched = getAddonSetting('next_schedule', sType=BOOL)
+
+        self.__monitored_ports = self.createwellformedlist('monitored_ports')
+        self.__pp_list = self.createwellformedlist('processor_list')
+
+        # EPG-Wakeup settings
+        self.__epg_interval = getAddonSetting('epgtimer_interval', sType=NUM)
+        self.__epg_time = getAddonSetting('epgtimer_time', sType=NUM)
+        self.__epg_duration = getAddonSetting('epgtimer_duration', sType=NUM)
+        self.__epg_grab_ext = getAddonSetting('epg_grab_ext', sType=BOOL)
+        self.__epg_socket = xbmc.translatePath(getAddonSetting('epg_socket_path'))
+        self.__epg_store = getAddonSetting('store_epg', sType=BOOL)
+        self.__epg_path = xbmc.translatePath(os.path.join(getAddonSetting('epg_path'), 'epg.xml'))
+
+        writeLog('Settings loaded')
+
+        # PVR server
+        _st = int(time.time())
+        _attempts = getAddonSetting('conn_attempts', sType=NUM)
+        while not self.hasPVR and _attempts > 0:
+            query = {'method': 'PVR.GetProperties',
+                     'params': {'properties': ['available']}}
+            self.hasPVR = False if not jsonrpc(query) else True
+            if self.hasPVR: break
+            xbmc.sleep(5000)
+            _attempts -= 1
+        writeLog('Wait %s seconds for PVR response' % (int(time.time()) - _st))
+        if not self.hasPVR:
+            writeLog('PVR timed out', xbmc.LOGFATAL)
+            notify(ADDON_NAME, LS(30032), icon=xbmcgui.NOTIFICATION_WARNING)
+
+
+    @classmethod
+    def createwellformedlist(cls, setting):
+        """
+        transform possible ugly userinput (e.g. 'p1, p2,,   p3 p4  ') to a shapely list
+        """
+        return ' '.join(getAddonSetting(setting).replace(',', ' ').split()).split()
+
+
+    def local_to_utc_datetime(self, local_datetime):
+        """
+        converts local datetime to datetime in utc
+        :param local_datetime as datetime object:
+        :return: utc_datetime as datetime object
+        """
+        return local_datetime - datetime.timedelta(seconds=TIME_OFFSET)
+
+    def utc_to_local_datetime(self, utc_datetime):
+        """
+        converts utc_datetime to datetime in local timezone
+        :param utc_datetime as datetime object:
+        :return loacl_datetime as datetime object:
+        """
+        return utc_datetime + datetime.timedelta(seconds=TIME_OFFSET)
+
+    def get_pvr_events(self, flags):
+        __curTime = datetime.datetime.utcnow()
+
+        if self.hasPVR:
+            # Check for current recordings
+            query = {'method': 'PVR.GetProperties',
+                     'params': {'properties': ['recording']}}
+            response = jsonrpc(query)
+            if response['recording']: flags |= isREC
+
+            # Check for timers
+            query = {'method': 'PVR.GetTimers',
+                     'params': {'properties': ['starttime', 'startmargin']}}
+            response = jsonrpc(query)
+            if response.get('timers', False) and not (flags & isREC):
+                self.wakeREC = datetime.datetime.strptime(response['timers'][0]['starttime'], JSON_TIME_FORMAT) -  \
+                    datetime.timedelta(minutes=response['timers'][0]['startmargin'], seconds=getAddonSetting('margin_start'))
+
+                flags |= isRES
+
+        # Check next EPG
+        if self.__epg_interval > 0:
+            __dayDelta = int(__curTime.strftime('%j')) % self.__epg_interval
+            __epg = __curTime + datetime.timedelta(days=__dayDelta)
+            self.wakeEPG = self.local_to_utc_datetime(__epg.replace(hour=self.__epg_time, minute=0, second=0, microsecond=0))
+            flags |= isRES
+
+        return flags
+
+    def getSysState(self, verbose=False):
+        _flags = isUSR
+        __curTime = datetime.datetime.utcnow()
+
+        # Check for PVR events
+        _flags |= self.get_pvr_events(_flags)
+        if self.wakeREC:
+            if __curTime + datetime.timedelta(seconds=getAddonSetting('margin_start', sType=NUM) +
+                    getAddonSetting('margin_stop', sType=NUM)) >= self.wakeREC: _flags |= isREC
+        if self.wakeEPG:
+            if self.wakeEPG <= __curTime <= self.wakeEPG + datetime.timedelta(minutes=self.__epg_duration): _flags |= isEPG
+
+        # Check if any watched process is running
+        if getAddonSetting('postprocessor_enable', sType=BOOL):
+            for _proc in self.__pp_list:
+                _pid = subprocess.Popen(['pidof', _proc], stdout=subprocess.PIPE)
+                if _pid.stdout.read().strip(): _flags |= isPRG
+
+        # Check for active network connection(s)
+        if getAddonSetting('network', sType=BOOL):
+            _port = []
+            for port in self.__monitored_ports:
+                nwc = subprocess.Popen('netstat -an | grep -iE "(established|verbunden)" | grep -v "127.0.0.1" | grep ":%s "' %
+                                       port, stdout=subprocess.PIPE, shell=True).communicate()
+                nwc = nwc[0].strip()
+                if nwc and len(nwc.split('\n')) > 0:
+                    _flags |= isNET
+                    _port.append(port)
+            if _port: writeLog('Network on port %s established and active' % (', '.join(_port)))
+
+        if verbose: writeLog('Status flags: {0:05b} (RES/NET/PRG/REC/EPG)'.format(_flags))
+        return _flags
+
+    def calcNextSched(self):
+        _flags = self.getSysState(verbose=False) & isRES
+
+        if not self.wakeREC:
+            writeLog('No recordings to schedule')
+
+        if not self.wakeEPG:
+            writeLog('No EPG to schedule')
+
+        if _flags:
+            id4msg = 30018
+            if self.wakeREC and not self.wakeEPG: self.wakeUTC = self.wakeREC
+            elif self.wakeEPG and not self.wakeREC:
+                self.wakeUTC = self.wakeEPG
+                id4msg = 30019
+            elif self.wakeREC and self.wakeEPG and self.wakeREC <= self.wakeEPG: self.wakeUTC = self.wakeREC
+            else:
+                self.wakeUTC = self.wakeEPG
+                id4msg = 30019
+
+            # show notifications
+            time4msg = self.utc_to_local_datetime(self.wakeUTC).strftime('%d.%m.%y %H:%M')
+            if id4msg == 30018:
+                writeLog('Wakeup for recording at %s' % (time4msg))
+                _flags |= isREC
+                if self.__nextsched: notify(LS(30017), LS(id4msg) % (time4msg))
+            elif id4msg == 30019:
+                writeLog('Wakeup for EPG update at %s' % (time4msg))
+                _flags |= isEPG
+                if self.__nextsched: notify(LS(30017), LS(id4msg) % (time4msg))
+        else:
+            if self.__nextsched: notify(LS(30010), LS(30014))
+        xbmc.sleep(6000)
+        return _flags
+
+    @classmethod
+    def countDown(cls, counter=5):
+
+        __bar = 0
+        __percent = 0
+        __counter = counter
+        __idleTime = xbmc.getGlobalIdleTime()
+
+        # deactivate screensaver (send key select)
+
+        if xbmc.getCondVisibility('System.ScreenSaverActive'):
+            query = {
+                "method": "Input.Select"
+            }
+            jsonrpc(query)
+
+        if xbmc.getCondVisibility('VideoPlayer.isFullscreen'):
+            writeLog('Countdown possibly invisible (fullscreen mode)')
+            writeLog('Showing additional notification')
+            notify(LS(30010), LS(30011) % (__counter))
+
+        # show countdown
+
+        writeLog('Display countdown dialog for %s secs' % __counter)
+        pb = xbmcgui.DialogProgressBG()
+        pb.create(LS(30010), LS(30011) % __counter)
+        pb.update(__percent)
+
+        # actualize progressbar
+
+        while __bar <= __counter:
+            __percent = int(__bar * 100 / __counter)
+            pb.update(__percent, LS(30010), LS(30011) % (__counter - __bar))
+
+            if __idleTime > xbmc.getGlobalIdleTime():
+                writeLog('Countdown aborted by user', level=xbmc.LOGNOTICE)
+                pb.close()
+                return True
+
+            xbmc.sleep(1000)
+            __idleTime += 1
+            __bar +=1
+        pb.close()
+        return False
+
+    def setWakeup(self):
+
+        if xbmc.getCondVisibility('Player.Playing'):
+            writeLog('Stopping Player')
+            xbmc.Player().stop()
+
+        _flags = self.calcNextSched()
+        _utc = int(time.mktime(self.utc_to_local_datetime(self.wakeUTC).timetuple()))
+        writeLog('Instruct the system to shut down (option %s)' % (getAddonSetting('shutdown_method', sType=NUM)), xbmc.LOGNOTICE)
+        writeLog('Wake-Up Unix timestamp: %s' % (_utc), xbmc.LOGNOTICE)
+        writeLog('Flags on resume points will be later {0:05b}'.format(_flags))
+        # return _flags
+
+        os.system('%s%s %s %s' % (self.__sudo, SHUTDOWN_CMD, _utc, getAddonSetting('shutdown_method', sType=NUM)))
+        if self.__shutdown == 0: xbmc.shutdown()
+        xbmc.sleep(1000)
+
+        # If we suspend instead of poweroff the system, we need the flags to control the main loop of the service.
+        # On suspend we have to resume the service on resume points instead of start on poweron/login.
+        # additional we set the resume flag in calcNextSched if necessary
+
+        return _flags
+
+    ####################################### START MAIN SERVICE #####################################
+
+    def start(self, mode=None):
+
+        writeLog('Starting service with id:%s@mode:%s' % (self.rndProcNum, mode))
+        _flags = self.getSysState(verbose=True)
+
+        if mode is None:
+
+            if not (_flags & (isREC | isEPG | isPRG | isNET)):
+                writeLog('Service with id %s finished' % (self.rndProcNum), level=xbmc.LOGNOTICE)
+                return
+
+        elif mode == 'sendmail':
+            if deliverMail(release['hostname'], LS(30065) % (release['hostname'])):
+                dialogOK(LS(30066), LS(30068) % (getAddonSetting('smtp_to')))
+            else:
+                dialogOK(LS(30067), LS(30069) % (getAddonSetting('smtp_to')))
+            return
+
+        elif mode == 'poweroff':
+            writeLog('Poweroff command received', level=xbmc.LOGNOTICE)
+
+            if (_flags & isREC):
+                notify(LS(30015), LS(30020), icon=xbmcgui.NOTIFICATION_WARNING)  # Notify 'Recording in progress'
+            elif (_flags & isEPG):
+                notify(LS(30015), LS(30021), icon=xbmcgui.NOTIFICATION_WARNING)  # Notify 'EPG-Update'
+            elif (_flags & isPRG):
+                notify(LS(30015), LS(30022), icon=xbmcgui.NOTIFICATION_WARNING)  # Notify 'Postprocessing'
+            elif (_flags & isNET):
+                notify(LS(30015), LS(30023), icon=xbmcgui.NOTIFICATION_WARNING)  # Notify 'Network active'
+            else:
+                if self.countDown(): return
+                _flags = self.setWakeup()
+        else: return
+
+        # RESUME POINT #1
+
+        if (_flags & isRES) and mode == 'poweroff':
+            writeLog('Resume point #1 passed', xbmc.LOGNOTICE)
+            _flags = self.getSysState(verbose=True) & (isREC | isEPG | isPRG | isNET)
+            if not _flags: return
+            mode = None
+
+        if (_flags & isEPG) and self.__epg_grab_ext and os.path.isfile(EXTGRABBER):
+            writeLog('Starting script for grabbing external EPG')
+            #
+            # ToDo: implement startup of external script (epg grabbing)
+            #
+            _epgpath = self.__epg_path
+            if self.__epg_store and _epgpath == '': _epgpath = '/dev/null'
+            _start = datetime.datetime.now()
+            try:
+                _comm = subprocess.Popen('%s %s %s' % (EXTGRABBER, _epgpath, self.__epg_socket),
+                                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
+                while _comm.poll() is None:
+                    writeLog(_comm.stdout.readline().decode('utf-8', 'ignore').strip())
+
+                writeLog('external EPG grabber script tooks %s seconds' % ((datetime.datetime.now() - _start).seconds))
+            except Exception:
+                writeLog('Could not start external EPG grabber script', xbmc.LOGERROR)
+
+        idle = xbmc.getGlobalIdleTime()
+
+        ### START MAIN LOOP ###
+
+        mon = xbmc.Monitor()
+
+        while _flags:
+
+            _flags = self.getSysState(verbose=True) & (isREC | isEPG | isPRG | isNET)
+
+            # check outdated recordings
+            query = {'method': 'PVR.GetTimers',
+                     'params': {'properties': ['title', 'state']}}
+            result = jsonrpc(query)
+
+            for pvr_item in result.get('timers', {}):
+                if not pvr_item in self.__recTitles:
+                    self.__recTitles.append(pvr_item)
+                    if pvr_item['state'] == 'recording':
+                        writeLog('Recording of "%s" is active' % (pvr_item['title']))
+
+            for item in self.__recTitles:
+                if not item in result.get('timers', {}):
+                    self.__recTitles.remove(item)
+                    writeLog('Recording of "%s" has finished: %s' % (item['title'], item['state']))
+                    if mode is None:
+                        deliverMail(release['hostname'], LS(30047) % (release['hostname'], item['title'], item['state']))
+
+            if mon.waitForAbort(CYCLE):
+                writeLog('Abort request received', level=xbmc.LOGNOTICE)
+                break
+            if idle > xbmc.getGlobalIdleTime():
+                writeLog('User activty detected (was %s idle)' % (time.strftime('%H:%M:%S', time.gmtime(idle))))
+                break
+            idle = xbmc.getGlobalIdleTime()
+
+            if not _flags:
+                if mode == 'poweroff':
+                    if self.countDown(counter=getAddonSetting('notification_counter', sType=NUM)): break
+                    _flags = self.setWakeup()
+                else:
+                    writeLog('Service was running w/o user activity', level=xbmc.LOGNOTICE)
+                    _flags = self.setWakeup()
+
+                # RESUME POINT #2
+
+                writeLog('Resume point #2 passed', xbmc.LOGNOTICE)
+                mode = None
+                idle = 0
+                _flags = self.getSysState(verbose=True) & (isREC | isEPG | isPRG | isNET)
+
+        ### END MAIN LOOP ###
+
+        ##################################### END OF MAIN SERVICE #####################################
+
+# mode translations
+
+if __name__ == '__main__':
+    try:
+        mode = sys.argv[1].upper()
+    except IndexError:
+        # Start without arguments (i.e. login|startup|restart)
+        mode = 'NONE'
+# try:
+    TVHMan = Manager()
+    TVHMan.start(mode=modes[mode])
+    writeLog('Service with id %s on %s kicks off' % (TVHMan.rndProcNum, release['hostname']), level=xbmc.LOGNOTICE)
+    del TVHMan
+# except Exception:
+    # writeLog('An unhandled exception has occured. Please inform the maintainer of this addon', xbmc.LOGERROR)
+    pass
