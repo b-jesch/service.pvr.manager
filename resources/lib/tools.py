@@ -8,6 +8,9 @@ import re
 import smtplib
 from email.message import Message
 
+import time
+import datetime
+
 ADDON_NAME = xbmcaddon.Addon().getAddonInfo('name')
 PATH = xbmcaddon.Addon().getAddonInfo('path')
 PROFILE = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))
@@ -53,7 +56,7 @@ def jsonrpc(query):
         if 'result' in response: return response['result']
     except TypeError, e:
         writeLog('Error executing JSON RPC: %s' % (e.message), xbmc.LOGFATAL)
-    return False
+    return None
 
 
 def getAddonSetting(setting, sType=STRING, multiplicator=1):
@@ -101,3 +104,9 @@ def deliverMail(hostname, message):
     else:
         writeLog('"%s" completed, no Mail delivered.' % (message))
     return True
+
+def strpTimeBug(datestring, formatstring):
+    try:
+        return datetime.datetime.strptime(datestring, formatstring)
+    except TypeError:
+        return datetime.datetime(*(time.strptime(datestring, formatstring)[0:6]))

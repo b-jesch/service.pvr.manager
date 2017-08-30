@@ -174,8 +174,8 @@ msgid "PVR Notification from %s"
 msgstr "PVR Hinweismeldung von %s"
 
 msgctxt "#30047"
-msgid "%s has recording of '%s' finished with state '%s'."
-msgstr "%s hat die Aufnahme '%s' mit status '%s' abgeschlossen."
+msgid "%s has recording of '%s' finished."
+msgstr "%s hat die Aufnahme '%s' abgeschlossen."
 
 msgctxt "#30048"
 msgid "Charset"

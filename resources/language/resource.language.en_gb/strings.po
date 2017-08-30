@@ -178,7 +178,7 @@ msgid "PVR Notification from %s"
 msgstr ""
 
 msgctxt "#30047"
-msgid "%s has recording of '%s' finished with state '%s'."
+msgid "%s has recording of '%s' finished."
 msgstr ""
 
 msgctxt "#30048"

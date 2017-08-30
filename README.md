@@ -3,7 +3,7 @@ service.tvh.manager
 
 Addon for 'PVR Timer- and Powermanagement' for XBMC/Kodi. This addon turns your vanilla Kodi on a Linux installation (pure Linux, Kodibuntu, Open-/LibreELEC) into a full featured video recorder.
 
-This addon handles poweroff management for current active recordings and wakeup procedures for future schedules using the XML-Interface of TVHeadend. This plugin starts and shut down the htpc if a recording is scheduled. It delivers optional Emails via SMTP if an automatic scheduled Recording ended successfully. 
+This addon handles poweroff management for current active recordings and wakeup procedures for future schedules using the JSON-RPC-Interface of Kodi. The addon starts and shut down the htpc if a recording is scheduled. It delivers optional Emails via SMTP if an automatic scheduled Recording ended successfully.
 
 The plugin starts the system periodically on an user defined cycle and time for e.g. EPG-Updates too if there is a longer inactivity time of the system or user.
 
@@ -13,9 +13,9 @@ Some installation notes
 
 1.	YOU KNOW WHAT A TERMINAL CONSOLE IS AND YOU ARE ABLE TO USE IT.
 
-2.	THIS ADDON USE ACPI-WAKEUP OVER RTC. YOUR MAINBOARD MUST SUPPORT THIS PROPERLY. NOTE THAT IN YOUR APM-SETTINGS OF YOUR BOARD THE RTC WAKEUP SHOULD BE SET TO ‘by OS’ OR ‘disabled’.
+2.	THIS ADDON USE ACPI-WAKEUP OVER RTC. YOUR MAINBOARD MUST SUPPORT THIS PROPERLY. NOTE THAT IN YOUR APM-SETTINGS OF YOUR BOARD THE RTC WAKEUP SHOULD BE SET TO ‘by OS’ OR ‘disabled’. YOU CAN ALSO USE A SPECIAL USB REMOTE CONTROLLER 'Y.A.R.D.2'. IF THIS IS CHOOSEN, THE RTC OF Y.A.R.D.2 IS USED.
 
-3.	THIS README USES kodi AS THE DEFAULT USER. IF KODI IS RUNNING WITH A DIFFERENT USERNAME, CHANGE ALL OCCURENCES OF '/home/kodi/' TO '/home/yourusername/' IN YOUR PATHNAMES/NAMES.
+3.	THIS README USES ```kodi``` AS THE DEFAULT USER. IF KODI IS RUNNING WITH A DIFFERENT USERNAME, CHANGE ALL OCCURENCES OF ```/home/kodi/``` TO ```/home/yourusername/``` IN YOUR PATHNAMES/NAMES.
 
 Installation
 ------------
@@ -30,7 +30,7 @@ Installation
 
     add below:
 	
-        Cmnd_Alias PVR_CMDS = /home/kodi/.kodi/addons/service.tvh.manager/resources/lib/shutdown.sh
+        Cmnd_Alias PVR_CMDS = /home/kodi/.kodi/addons/service.pvr.manager/resources/lib/shutdown.sh
         kodi ALL=NOPASSWD: PVR_CMDS
 
     Store your changes (CTRL+O, CTRL+X)
@@ -51,11 +51,11 @@ Installation
             <global>
                 <!-- This is the keyboard section -->
                 <keyboard>
-                    <f12>XBMC.RunScript(service.tvh.manager,poweroff)</f12>
+                    <f12>XBMC.RunScript(service.pvr.manager,poweroff)</f12>
                 </keyboard>
                 <!-- This is the remote section -->
                 <remote>
-                    <power>XBMC.RunScript(service.tvh.manager,poweroff)</power>
+                    <power>XBMC.RunScript(service.pvr.manager,poweroff)</power>
                 </remote>
             </global>
         </keymap>
@@ -78,12 +78,12 @@ and change this to:
         <item>
             <label>$LOCALIZE[13016]</label>
             <onclick>Powerdown()</onclick>
-            <visible>System.CanPowerDown + !System.HasAddon(service.tvh.manager)</visible>
+            <visible>System.CanPowerDown + !System.HasAddon(service.pvr.manager)</visible>
         </item>
         <item>
             <label>$LOCALIZE[13016]</label>
-            <onclick>RunScript(service.tvh.manager,poweroff</onclick>
-            <visible>System.CanPowerDown + System.HasAddon(service.tvh.manager)</visible>
+            <onclick>RunScript(service.pvr.manager,poweroff</onclick>
+            <visible>System.CanPowerDown + System.HasAddon(service.pvr.manager)</visible>
         </item>
 
 Don’t forget to store. Remember that you have to repeat this when the skin has updated.
