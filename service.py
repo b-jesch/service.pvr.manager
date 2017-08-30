@@ -277,14 +277,14 @@ class Manager(object):
                 writeLog('Service with id %s finished' % (self.rndProcNum), level=xbmc.LOGNOTICE)
                 return
 
-        elif mode == 'sendmail':
+        elif mode == 'CHECKMAILSETTINGS':
             if deliverMail(release['hostname'], LS(30065) % (release['hostname'])):
                 dialogOK(LS(30066), LS(30068) % (getAddonSetting('smtp_to')))
             else:
                 dialogOK(LS(30067), LS(30069) % (getAddonSetting('smtp_to')))
             return
 
-        elif mode == 'poweroff':
+        elif mode == 'POWEROFF':
             writeLog('Poweroff command received', level=xbmc.LOGNOTICE)
 
             if (_flags & isREC):
