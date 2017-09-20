@@ -11,8 +11,6 @@ JSON_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 SHUTDOWN_CMD = xbmc.translatePath(os.path.join(PATH, 'resources', 'lib', 'shutdown.sh'))
 EXTGRABBER = xbmc.translatePath(os.path.join(PATH, 'resources', 'lib', 'epggrab_ext.sh'))
 
-modes = {'NONE': None, 'POWEROFF': 'poweroff', 'CHECKMAILSETTINGS': 'sendmail'}
-
 release = release()
 writeLog('OS ID is %s' % (release['osid']))
 
@@ -27,7 +25,7 @@ _stg = os.stat(EXTGRABBER)
 if not (_sts.st_mode & stat.S_IEXEC): os.chmod(SHUTDOWN_CMD, _sts.st_mode | stat.S_IEXEC)
 if not (_stg.st_mode & stat.S_IEXEC): os.chmod(EXTGRABBER, _stg.st_mode | stat.S_IEXEC)
 
-CYCLE = 60  # polling cycle
+CYCLE = 30  # polling cycle
 
 # binary Flags
 
@@ -119,8 +117,10 @@ class Manager(object):
         if getAddonSetting('epgtimer_interval', sType=NUM) > 0:
             __dayDelta = int(__curTime.strftime('%j')) % getAddonSetting('epgtimer_interval', sType=NUM)
             __epg = __curTime + datetime.timedelta(days=__dayDelta)
-            self.wakeEPG = self.local_to_utc_datetime(__epg.replace(hour=getAddonSetting('epgtimer_time', sType=NUM),
-                                                                    minute=0, second=0, microsecond=0))
+            # self.wakeEPG = self.local_to_utc_datetime(__epg.replace(hour=getAddonSetting('epgtimer_time', sType=NUM),
+            #                                                         minute=0, second=0, microsecond=0))
+            self.wakeEPG = self.local_to_utc_datetime(__epg.replace(hour=8,
+                                                                    minute=25, second=0, microsecond=0))
             flags |= isRES
 
         return flags
@@ -172,11 +172,13 @@ class Manager(object):
 
         if _flags:
             id4msg = 30018
-            if self.wakeREC and not self.wakeEPG: self.wakeUTC = self.wakeREC
+            if self.wakeREC and not self.wakeEPG:
+                self.wakeUTC = self.wakeREC
             elif self.wakeEPG and not self.wakeREC:
                 self.wakeUTC = self.wakeEPG
                 id4msg = 30019
-            elif self.wakeREC and self.wakeEPG and self.wakeREC <= self.wakeEPG: self.wakeUTC = self.wakeREC
+            elif self.wakeREC and self.wakeEPG and self.wakeREC <= self.wakeEPG:
+                self.wakeUTC = self.wakeREC
             else:
                 self.wakeUTC = self.wakeEPG
                 id4msg = 30019
@@ -302,7 +304,7 @@ class Manager(object):
 
         # RESUME POINT #1
 
-        if (_flags & isRES) and mode == 'poweroff':
+        if (_flags & isRES) and mode == 'POWEROFF':
             writeLog('Resume point #1 passed', xbmc.LOGNOTICE)
             _flags = self.getSysState(verbose=True) & (isREC | isEPG | isPRG | isNET)
             if not _flags: return
@@ -333,31 +335,11 @@ class Manager(object):
         mon = xbmc.Monitor()
         tmpTimer = {}
         pvrTimer = []
+        curTimer = []
 
         while _flags:
 
             _flags = self.getSysState(verbose=True) & (isREC | isEPG | isPRG | isNET)
-
-            # check outdated recordings
-            query = {'method': 'PVR.GetTimers',
-                     'params': {'properties': ['title', 'state']}}
-            response = jsonrpc(query)
-
-            if response is not None:
-
-                for pvr_item in response.get('timers', None):
-                    if pvr_item is None: break
-                    if pvr_item['state'] == 'recording': tmpTimer.update({pvr_item['timerid']: {'title': pvr_item['title']}})
-                    if not pvr_item['timerid'] in pvrTimer and pvr_item['state'] == 'recording':
-                        pvrTimer.append(pvr_item['timerid'])
-                        writeLog('Recording of "%s" is active' % (pvr_item['title']))
-
-                for item in pvrTimer:
-                    if not item in tmpTimer:
-                        pvrTimer.remove(item)
-                        writeLog('Recording of "%s" has finished' % (tmpTimer[item]['title']))
-                        if mode is None:
-                            deliverMail(release['hostname'], LS(30047) % (release['hostname'], tmpTimer[item]['title']))
 
             if mon.waitForAbort(CYCLE):
                 writeLog('Abort request received', level=xbmc.LOGNOTICE)
@@ -367,8 +349,34 @@ class Manager(object):
                 break
             idle = xbmc.getGlobalIdleTime()
 
+            # check outdated recordings
+
+            query = {'method': 'PVR.GetTimers',
+                     'params': {'properties': ['title', 'state']}}
+            response = jsonrpc(query)
+
+            if response.get('timers', False):
+                for item in response.get('timers', {}):
+                    if item['state'] == 'recording':
+                        tmpTimer.update({item['timerid']: {'title': item['title']}})
+                        curTimer.append(item['timerid'])
+            else:
+                curTimer = []
+
+            for item in curTimer:
+                if not item in pvrTimer:
+                    pvrTimer.append(item)
+                    writeLog('"%s@%s" is active' % (tmpTimer[item]['title'], item))
+
+            for item in pvrTimer:
+                if not item in curTimer:
+                    pvrTimer.remove(item)
+                    writeLog('Remove "%s" from timer list as finished schedule' % (tmpTimer[item]['title']))
+                    if mode is None:
+                        deliverMail(release['hostname'], LS(30047) % (release['hostname'], tmpTimer[item]['title']))
+
             if not _flags:
-                if mode == 'poweroff':
+                if mode == 'POWEROFF':
                     if self.countDown(counter=getAddonSetting('notification_counter', sType=NUM)): break
                     _flags = self.setWakeup()
                 else:
@@ -401,6 +409,7 @@ if __name__ == '__main__':
         TVHMan.start(mode)
         writeLog('Service with id %s on %s kicks off' % (TVHMan.rndProcNum, release['hostname']), level=xbmc.LOGNOTICE)
         del TVHMan
-    except Exception:
-        writeLog('An unhandled exception has occured. Please inform the maintainer of this addon', xbmc.LOGERROR)
+    except Exception, e:
+        writeLog('An unhandled exception has occured.', xbmc.LOGERROR)
+        writeLog(e.message, xbmc.LOGERROR)
 
