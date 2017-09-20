@@ -366,12 +366,12 @@ class Manager(object):
             for item in curTimer:
                 if not item in pvrTimer:
                     pvrTimer.append(item)
-                    writeLog('"%s@%s" is active' % (tmpTimer[item]['title'], item))
+                    writeLog('Timer #%s of "%s" is recording' % (item, tmpTimer[item]['title']))
 
             for item in pvrTimer:
                 if not item in curTimer:
                     pvrTimer.remove(item)
-                    writeLog('Remove "%s" from timer list as finished schedule' % (tmpTimer[item]['title']))
+                    writeLog('Timer #%s has finished recording of "%s"' % (item, tmpTimer[item]['title']))
                     if mode is None:
                         deliverMail(release['hostname'], LS(30047) % (release['hostname'], tmpTimer[item]['title']))
 
