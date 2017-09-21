@@ -9,9 +9,9 @@
   <extension point="xbmc.python.script" library="service.py" />
   <extension point="xbmc.addon.metadata">
     <platform>linux</platform>
-    <summary lang="en">PVR Recording &amp; Power Manager</summary>
-    <summary lang="de">PVR Recording &amp; Power Manager</summary>
-    <summary lang="pl">PVR Recording &amp; Power Manager</summary>
+    <summary lang="en">PVR Recording &amp;amp; Power Manager</summary>
+    <summary lang="de">PVR Recording &amp;amp; Power Manager</summary>
+    <summary lang="pl">PVR Recording &amp;amp; Power Manager</summary>
     <description lang="en">Recording and power management for current active recordings and wakeup procedures for future schedules using JSON-RPC. The service delivers optional Emails via SMTP if an automatic scheduled recording ended successfully. Prevents shutdown/poweroff the system while an active schedule is running. Ability to start the system periodically on an user defined cycle and time for e.g. EPG-Updates if there is a longer inactivity time of the system.</description>
     <description lang="de">Power- und Timer-Management für aktuell laufende Aufnahmen sowie Aufweckmechanismen für spätere timergesteuerte Aufnahmen unter Nutzung von JSON-RPC. Verhindert ein versehentliches Herunterfahren des Systems während einer Aufnahme. Der Dienst versendet optional Emails via SMTP, wenn eine automatische Aufnahme erfolgreich abgeschlossen wurde. Zusätzlich wird das System zyklisch zu einer einstellbaren Zeit aufgeweckt, um z.B das EPG zu aktualisieren.</description>
     <disclaimer lang="de">Benutzung auf eigene Gefahr. Keine Haftung für nicht gesetzte Timer, nicht durchgeführte Aufnahmen und andere Seiteneffekte!</disclaimer>
