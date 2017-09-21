@@ -106,13 +106,16 @@ class Manager(object):
 
             # Check for timers
             query = {'method': 'PVR.GetTimers',
-                     'params': {'properties': ['starttime', 'startmargin']}}
+                     'params': {'properties': ['starttime', 'startmargin', 'istimerrule']}}
             response = jsonrpc(query)
             if response is not None and response.get('timers', False) and not (flags & isREC):
-                self.wakeREC = strpTimeBug(response['timers'][0]['starttime'], JSON_TIME_FORMAT) -  \
-                    datetime.timedelta(minutes=response['timers'][0]['startmargin'],
+                for timer in response.get('timers'):
+                    if timer['istimerrule']: continue
+                    self.wakeREC = strpTimeBug(timer['starttime'], JSON_TIME_FORMAT) -  \
+                    datetime.timedelta(minutes=timer['startmargin'],
                                        seconds=getAddonSetting('margin_start', sType=NUM))
-                flags |= isRES
+                    flags |= isRES
+                    break
 
         # Check next EPG
         if getAddonSetting('epgtimer_interval', sType=NUM) > 0:
@@ -121,7 +124,6 @@ class Manager(object):
             self.wakeEPG = self.local_to_utc_datetime(__epg.replace(hour=getAddonSetting('epgtimer_time', sType=NUM),
                                                                     minute=0, second=0, microsecond=0))
             flags |= isRES
-
         return flags
 
     def getSysState(self, verbose=True):
