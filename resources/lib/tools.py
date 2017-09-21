@@ -22,9 +22,11 @@ STRING = 0
 BOOL = 1
 NUM = 2
 
-def writeLog(message, level=xbmc.LOGDEBUG):
-    xbmc.log('[%s %s] %s' % (xbmcaddon.Addon().getAddonInfo('id'),
+def writeLog(proc, message, level=xbmc.LOGDEBUG):
+    if proc != '': proc ='@%s' % (proc)
+    xbmc.log('[%s %s%s] %s' % (xbmcaddon.Addon().getAddonInfo('id'),
                              xbmcaddon.Addon().getAddonInfo('version'),
+                             proc,
                              message.encode('utf-8')), level)
 
 
