@@ -9,6 +9,7 @@ TIME_OFFSET = int(round((datetime.datetime.now() - datetime.datetime.utcnow()).s
 JSON_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 SHUTDOWN_CMD = xbmc.translatePath(os.path.join(PATH, 'resources', 'lib', 'shutdown.sh'))
+SHUTDOWN_METHOD = [LS(30012), LS(30013), LS(30025)]
 EXTGRABBER = xbmc.translatePath(os.path.join(PATH, 'resources', 'lib', 'epggrab_ext.sh'))
 
 release = release()
@@ -84,6 +85,7 @@ class Manager(object):
         :param: local_datetime as datetime object
         :return: utc_datetime as datetime object
         """
+        if local_datetime == None: local_datetime = datetime.datetime.fromtimestamp(0)
         return local_datetime - datetime.timedelta(seconds=TIME_OFFSET)
 
     def utc_to_local_datetime(self, utc_datetime):
@@ -92,6 +94,7 @@ class Manager(object):
         :param: utc_datetime as datetime object
         :return: loacl_datetime as datetime object
         """
+        if utc_datetime == None: utc_datetime = datetime.datetime.fromtimestamp(0)
         return utc_datetime + datetime.timedelta(seconds=TIME_OFFSET)
 
     def get_pvr_events(self, flags):
@@ -252,8 +255,8 @@ class Manager(object):
 
         _flags = self.calcNextSched()
         _utc = int(time.mktime(self.utc_to_local_datetime(self.wakeUTC).timetuple()))
-        writeLog(self.rndProcNum, 'Instruct the system to shut down (option %s)' %
-                 (getAddonSetting('shutdown_method', sType=NUM)), xbmc.LOGNOTICE)
+        writeLog(self.rndProcNum, 'Instruct the system to shut down using %s' %
+                 (SHUTDOWN_METHOD[getAddonSetting('shutdown_method', sType=NUM)]), xbmc.LOGNOTICE)
         writeLog(self.rndProcNum, 'Wake-Up Unix timestamp: %s' % (_utc), xbmc.LOGNOTICE)
         writeLog(self.rndProcNum, 'Flags on resume points will be later {0:05b}'.format(_flags))
 
