@@ -145,8 +145,7 @@ class Manager(object):
         # Check if any watched process is running
         if getAddonSetting('postprocessor_enable', sType=BOOL):
             for _proc in self.__pp_list:
-                _pid = subprocess.Popen(['pidof', _proc], stdout=subprocess.PIPE)
-                if _pid.stdout.read().strip(): _flags |= isPRG
+                if getProcessPID(_proc): _flags |= isPRG
 
         # Check for active network connection(s)
         if getAddonSetting('network', sType=BOOL):
