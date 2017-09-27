@@ -66,7 +66,7 @@ msgid "Kodi"
 msgstr ""
 
 msgctxt "#30013"
-msgid "OS (Power off)"
+msgid "OS (Power off, Linux only)"
 msgstr ""
 
 msgctxt "#30014"
