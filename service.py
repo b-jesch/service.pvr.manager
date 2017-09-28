@@ -2,7 +2,8 @@
 
 from resources.lib.tools import *
 
-import sys, os, stat, subprocess
+import sys
+import stat
 import random
 
 TIME_OFFSET = int(round((datetime.datetime.now() - datetime.datetime.utcnow()).seconds, -1))
