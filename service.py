@@ -340,7 +340,6 @@ class Manager(object):
 
         tmpTimer = {}
         pvrTimer = []
-        curTimer = []
         idle = xbmc.getGlobalIdleTime()
         mon = xbmc.Monitor()
 
@@ -369,6 +368,7 @@ class Manager(object):
 
             # check outdated recordings
 
+            curTimer = []
             query = {'method': 'PVR.GetTimers',
                      'params': {'properties': ['title', 'state']}}
             response = jsonrpc(query)
@@ -378,8 +378,6 @@ class Manager(object):
                     if item['state'] == 'recording':
                         tmpTimer.update({item['timerid']: {'title': item['title']}})
                         curTimer.append(item['timerid'])
-            else:
-                curTimer = []
 
             for item in curTimer:
                 if not item in pvrTimer:
