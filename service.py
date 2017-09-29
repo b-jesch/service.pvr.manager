@@ -14,11 +14,11 @@ SHUTDOWN_METHOD = [LS(30012), LS(30013), LS(30025)]
 EXTGRABBER = xbmc.translatePath(os.path.join(PATH, 'resources', 'lib', 'epggrab_ext.sh'))
 
 release = release()
-writeLog('', 'OS ID is %s' % (release['osid']))
+writeLog(None, 'OS ID is %s' % (release['osid']))
 
 if ('libreelec' or 'openelec') in release['osid'] and getAddonSetting('sudo', sType=BOOL):
     xbmcaddon.Addon().setSetting('sudo', 'false')
-    writeLog('', 'Reset wrong setting \'sudo\' to False')
+    writeLog(None, 'Reset wrong setting \'sudo\' to False')
 
 # set permissions for these files, required after installation or update
 
@@ -422,5 +422,5 @@ if __name__ == '__main__':
 
     TVHMan = Manager()
     TVHMan.start(mode)
-    writeLog('', 'Service with id %s on %s kicks off' % (TVHMan.rndProcNum, release['hostname']), level=xbmc.LOGNOTICE)
+    writeLog(None, 'Service with id %s on %s kicks off' % (TVHMan.rndProcNum, release['hostname']), level=xbmc.LOGNOTICE)
     del TVHMan

@@ -25,7 +25,7 @@ BOOL = 1
 NUM = 2
 
 def writeLog(proc, message, level=xbmc.LOGDEBUG):
-    if proc != '': proc ='@%s' % (proc)
+    if proc is not None: proc ='@%s' % (proc)
     xbmc.log('[%s %s%s] %s' % (xbmcaddon.Addon().getAddonInfo('id'),
                              xbmcaddon.Addon().getAddonInfo('version'),
                              proc,
@@ -64,7 +64,7 @@ def getProcessPID(process):
             return PID[-1].split()[1]
         else: return False
     else:
-        writeLog('', 'Running on %s, could not determine PID of %s' % (OS, process))
+        writeLog(None, 'Running on %s, could not determine PID of %s' % (OS, process))
         return False
 
 
@@ -78,7 +78,7 @@ def jsonrpc(query):
         response = json.loads(xbmc.executeJSONRPC(json.dumps(querystring, encoding='utf-8')))
         if 'result' in response: return response['result']
     except TypeError, e:
-        writeLog('', 'Error executing JSON RPC: %s' % (e.message), xbmc.LOGFATAL)
+        writeLog(None, 'Error executing JSON RPC: %s' % (e.message), xbmc.LOGFATAL)
     return None
 
 
@@ -118,11 +118,11 @@ def deliverMail(hostname, message):
             __s_conn.login(getAddonSetting('smtp_user'), getAddonSetting('smtp_passwd'))
             __s_conn.sendmail(getAddonSetting('smtp_from'), getAddonSetting('smtp_to'), __s_msg.as_string())
             __s_conn.close()
-            writeLog('', 'Mail delivered to %s.' % (getAddonSetting('smtp_to')), level=xbmc.LOGNOTICE)
+            writeLog(None, 'Mail delivered to %s.' % (getAddonSetting('smtp_to')), level=xbmc.LOGNOTICE)
             return True
         except Exception, e:
-            writeLog('', 'Mail could not be delivered. Check your settings.', xbmc.LOGERROR)
-            writeLog('', e.message)
+            writeLog(None, 'Mail could not be delivered. Check your settings.', xbmc.LOGERROR)
+            writeLog(None, e.message)
             return False
     return True
 
