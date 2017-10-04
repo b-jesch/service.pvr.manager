@@ -1,17 +1,19 @@
-import xbmc
-import xbmcgui
-import xbmcaddon
+
+import datetime
+import time
 import json
 import platform
 import subprocess
 import os
 import re
 
+import xbmc
+import xbmcgui
+import xbmcaddon
+
 import smtplib
 from email.message import Message
 
-import time
-import datetime
 
 ADDON_NAME = xbmcaddon.Addon().getAddonInfo('name')
 PATH = xbmcaddon.Addon().getAddonInfo('path')
@@ -131,3 +133,5 @@ def strpTimeBug(datestring, formatstring):
         return datetime.datetime.strptime(datestring, formatstring)
     except TypeError:
         return datetime.datetime(*(time.strptime(datestring, formatstring)[0:6]))
+    except ImportError:
+        pass
