@@ -13,10 +13,10 @@ SHUTDOWN_CMD = xbmc.translatePath(os.path.join(PATH, 'resources', 'lib', 'shutdo
 SHUTDOWN_METHOD = [LS(30012), LS(30013), LS(30025)]
 EXTGRABBER = xbmc.translatePath(os.path.join(PATH, 'resources', 'lib', 'epggrab_ext.sh'))
 
-release = release()
-writeLog(None, 'OS ID is %s' % (release['osid']))
+osv = release()
+writeLog(None, 'OS ID is %s' % (osv['osid']))
 
-if ('libreelec' or 'openelec') in release['osid'] and getAddonSetting('sudo', sType=BOOL):
+if ('libreelec' or 'openelec') in osv['osid'] and getAddonSetting('sudo', sType=BOOL):
     xbmcaddon.Addon().setSetting('sudo', 'false')
     writeLog(None, 'Reset wrong setting \'sudo\' to False')
 
@@ -260,9 +260,10 @@ class Manager(object):
         writeLog(self.rndProcNum, 'Wake-Up Unix timestamp: %s' % (_utc), xbmc.LOGNOTICE)
         writeLog(self.rndProcNum, 'Flags on resume points will be later {0:05b}'.format(_flags))
 
-        sudo = 'sudo ' if getAddonSetting('sudo', sType=BOOL) else ''
-        os.system('%s%s %s %s' % (sudo, SHUTDOWN_CMD, _utc, getAddonSetting('shutdown_method', sType=NUM)))
-        if getAddonSetting('shutdown_method', sType=NUM) == 0: xbmc.shutdown()
+        if osv['platform'] == 'Linux':
+            sudo = 'sudo ' if getAddonSetting('sudo', sType=BOOL) else ''
+            os.system('%s%s %s %s' % (sudo, SHUTDOWN_CMD, _utc, getAddonSetting('shutdown_method', sType=NUM)))
+        if getAddonSetting('shutdown_method', sType=NUM) == 0 or osv['platform'] == 'Windows': xbmc.shutdown()
         xbmc.sleep(1000)
 
         # If we suspend instead of poweroff the system, we need the flags to control the main loop of the service.
@@ -285,7 +286,7 @@ class Manager(object):
                 return
 
         elif mode == 'CHECKMAILSETTINGS':
-            if deliverMail(release['hostname'], LS(30065) % (release['hostname'])):
+            if deliverMail(osv['hostname'], LS(30065) % (osv['hostname'])):
                 dialogOK(LS(30066), LS(30068) % (getAddonSetting('smtp_to')))
             else:
                 dialogOK(LS(30067), LS(30069) % (getAddonSetting('smtp_to')))
@@ -317,7 +318,8 @@ class Manager(object):
             if not _flags: return
             # mode = None
 
-        if (_flags & isEPG) and getAddonSetting('epg_grab_ext', sType=BOOL) and os.path.isfile(EXTGRABBER):
+        if (_flags & isEPG) and getAddonSetting('epg_grab_ext', sType=BOOL) and \
+                os.path.isfile(EXTGRABBER) and osv['platform'] == 'Linux':
             writeLog(self.rndProcNum, 'Starting script for grabbing external EPG')
             #
             # ToDo: implement startup of external script (epg grabbing)
@@ -389,7 +391,7 @@ class Manager(object):
                     pvrTimer.remove(item)
                     writeLog(self.rndProcNum, 'Timer #%s has finished recording of "%s"' % (item, tmpTimer[item]['title']))
                     if mode is None:
-                        deliverMail(release['hostname'], LS(30047) % (release['hostname'], tmpTimer[item]['title']))
+                        deliverMail(osv['hostname'], LS(30047) % (osv['hostname'], tmpTimer[item]['title']))
 
             if not _flags:
                 if mode == 'POWEROFF':
@@ -422,5 +424,5 @@ if __name__ == '__main__':
 
     TVHMan = Manager()
     TVHMan.start(mode)
-    writeLog(None, 'Service with id %s on %s kicks off' % (TVHMan.rndProcNum, release['hostname']), level=xbmc.LOGNOTICE)
+    writeLog(None, 'Service with id %s on %s kicks off' % (TVHMan.rndProcNum, osv['hostname']), level=xbmc.LOGNOTICE)
     del TVHMan
