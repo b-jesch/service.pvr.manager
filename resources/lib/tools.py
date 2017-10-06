@@ -27,7 +27,10 @@ BOOL = 1
 NUM = 2
 
 def writeLog(proc, message, level=xbmc.LOGDEBUG):
-    if proc is not None: proc ='@%s' % (proc)
+    if proc is not None:
+        proc ='@%s' % (proc)
+    else:
+        proc = ''
     xbmc.log('[%s %s%s] %s' % (xbmcaddon.Addon().getAddonInfo('id'),
                              xbmcaddon.Addon().getAddonInfo('version'),
                              proc,
