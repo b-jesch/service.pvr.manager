@@ -1,6 +1,7 @@
 
 import datetime
 import time
+from dateutil import parser
 import json
 import platform
 import subprocess
@@ -137,4 +138,4 @@ def strpTimeBug(datestring, formatstring):
     except TypeError:
         return datetime.datetime(*(time.strptime(datestring, formatstring)[0:6]))
     except ImportError:
-        pass
+        return parser.parse(datestring)

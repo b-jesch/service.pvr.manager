@@ -1,3 +1,7 @@
+0.0.8
+- Bugfix (Python Bug in datetime.strptime)
+- Code optimizations for Windows
+
 0.0.2
 - some WIP
 
