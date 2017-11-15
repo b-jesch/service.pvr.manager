@@ -1,7 +1,6 @@
 
 import datetime
 import time
-from dateutil import parser
 import json
 import platform
 import subprocess
@@ -14,6 +13,7 @@ import xbmcaddon
 
 import smtplib
 from email.message import Message
+from dateutil import parser
 
 
 ADDON_NAME = xbmcaddon.Addon().getAddonInfo('name')

@@ -82,7 +82,7 @@ and change this to:
         </item>
         <item>
             <label>$LOCALIZE[13016]</label>
-            <onclick>RunScript(service.pvr.manager,poweroff</onclick>
+            <onclick>RunScript(service.pvr.manager,poweroff)</onclick>
             <visible>System.CanPowerDown + System.HasAddon(service.pvr.manager)</visible>
         </item>
 
