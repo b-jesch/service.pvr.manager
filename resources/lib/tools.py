@@ -102,7 +102,7 @@ def getAddonSetting(setting, sType=STRING, multiplicator=1):
         # send email to user to inform about a successful completition
 
 def deliverMail(hostname, message):
-    if getAddonSetting('smtp_sendmail'):
+    if getAddonSetting('smtp_sendmail', sType=BOOL):
         try:
             __port = {'None': 25, 'SSL/TLS': 465, 'STARTTLS': 587}
             __s_msg = Message()
