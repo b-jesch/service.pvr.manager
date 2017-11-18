@@ -70,8 +70,8 @@ msgid "OS (Power off, Linux only)"
 msgstr "OS (Ausschalten, nur Linux)"
 
 msgctxt "#30014"
-msgid "System will shutdown now"
-msgstr "System wird jetzt heruntergefahren"
+msgid "No wakeup timer is set"
+msgstr "Es wird kein Aufwachtimer gesetzt"
 
 msgctxt "#30015"
 msgid "Shutdown aborted"

@@ -70,7 +70,7 @@ msgid "OS (Power off, Linux only)"
 msgstr ""
 
 msgctxt "#30014"
-msgid "System will shutdown now"
+msgid "No wakeup timer is set"
 msgstr ""
 
 msgctxt "#30015"

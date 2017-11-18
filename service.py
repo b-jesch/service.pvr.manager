@@ -115,12 +115,11 @@ class Manager(object):
             if response is not None and response.get('timers', False) and not (flags & isREC):
                 for timer in response.get('timers'):
                     if timer['istimerrule']: continue
-                    writeLog(None, 'getting timer properties: %s' % (str(timer)))
-                    writeLog(None, 'getting addon property margin: %s' % (getAddonSetting('margin_start', sType=NUM)))
                     self.wakeREC = strpTimeBug(timer['starttime'], JSON_TIME_FORMAT) -  \
                     datetime.timedelta(minutes=timer['startmargin'],
                                        seconds=getAddonSetting('margin_start', sType=NUM))
                     flags |= isRES
+                    writeLog(self.rndProcNum, 'timer prepared for recording')
                     break
 
         # Check next EPG
