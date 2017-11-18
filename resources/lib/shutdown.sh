@@ -4,6 +4,7 @@ echo 0 > /sys/class/rtc/rtc0/wakealarm
 case "$2" in
     0)
         echo $1 > /sys/class/rtc/rtc0/wakealarm
+    ;;
     1)
         echo $1 > /sys/class/rtc/rtc0/wakealarm
         shutdown -h now "PVR Manager shutdown the system"
