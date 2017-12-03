@@ -48,6 +48,7 @@ class Manager(object):
 
         self.rndProcNum = random.randint(1, 1024)
         self.hasPVR = None
+        self.flags = isUSR
 
         self.__monitored_ports = self.createwellformedlist('monitored_ports')
         self.__pp_list = self.createwellformedlist('processor_list')
@@ -119,7 +120,7 @@ class Manager(object):
                     datetime.timedelta(minutes=timer['startmargin'],
                                        seconds=getAddonSetting('margin_start', sType=NUM))
                     flags |= isRES
-                    writeLog(self.rndProcNum, 'timer prepared for recording')
+                    writeLog(self.rndProcNum, 'timer@%s prepared for recording' % (self.wakeREC.strftime(JSON_TIME_FORMAT)))
                     break
 
         # Check next EPG
@@ -131,7 +132,7 @@ class Manager(object):
             flags |= isRES
         return flags
 
-    def getSysState(self, verbose=True):
+    def getSysState(self):
         _flags = isUSR
         __curTime = datetime.datetime.utcnow()
 
@@ -161,12 +162,14 @@ class Manager(object):
                     _port.append(port)
             if _port: writeLog(self.rndProcNum, 'Network on port %s established and active' % (', '.join(_port)))
 
-        if verbose: writeLog(self.rndProcNum, 'Status flags: {0:05b} (RES/NET/PRG/REC/EPG)'.format(_flags))
+        if self.flags ^ _flags:
+            writeLog(self.rndProcNum, 'Status changed: {0:05b} (RES/NET/PRG/REC/EPG)'.format(_flags))
+        self.flags = _flags
         return _flags
 
     def calcNextSched(self):
         __curTime = datetime.datetime.utcnow()
-        _flags = self.getSysState(verbose=False) & isRES
+        _flags = self.getSysState() & isRES
 
         if not self.wakeREC:
             writeLog(self.rndProcNum, 'No recordings to schedule')
@@ -190,7 +193,7 @@ class Manager(object):
                 id4msg = 30019
 
             # show notifications
-            time4msg = self.utc_to_local_datetime(self.wakeUTC).strftime('%d.%m.%y %H:%M')
+            time4msg = self.utc_to_local_datetime(self.wakeUTC).strftime(JSON_TIME_FORMAT)
             if id4msg == 30018:
                 writeLog(self.rndProcNum, 'Wakeup for recording at %s' % (time4msg))
                 _flags |= isREC

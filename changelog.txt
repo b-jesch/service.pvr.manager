@@ -1,3 +1,6 @@
+0.0.9
+- Bugfix in shutdown wrapper script
+
 0.0.8
 - Bugfix (Python Bug in datetime.strptime)
 - Code optimizations for Windows
