@@ -87,7 +87,7 @@ class Manager(object):
         :param: local_datetime as datetime object
         :return: utc_datetime as datetime object
         """
-        if local_datetime == None: local_datetime = datetime.datetime.fromtimestamp(0)
+        if local_datetime == None: return datetime.datetime.fromtimestamp(0)
         return local_datetime - datetime.timedelta(seconds=TIME_OFFSET)
 
     def utc_to_local_datetime(self, utc_datetime):
@@ -96,7 +96,7 @@ class Manager(object):
         :param: utc_datetime as datetime object
         :return: loacl_datetime as datetime object
         """
-        if utc_datetime == None: utc_datetime = datetime.datetime.fromtimestamp(0)
+        if utc_datetime == None: return datetime.datetime.fromtimestamp(0)
         return utc_datetime + datetime.timedelta(seconds=TIME_OFFSET)
 
     def get_pvr_events(self, flags):
