@@ -120,16 +120,20 @@ class Manager(object):
                     datetime.timedelta(minutes=timer['startmargin'],
                                        seconds=getAddonSetting('margin_start', sType=NUM))
                     flags |= isRES
-                    writeLog(self.rndProcNum, 'timer@%s prepared for recording' % (self.wakeREC.strftime(JSON_TIME_FORMAT)))
+                    writeLog(self.rndProcNum, 'No active timers yet, prepare timer@%s' % (self.wakeREC.strftime(JSON_TIME_FORMAT)))
                     break
+            else:
+                self.wakeREC = None
 
-        # Check next EPG
+        # Calculate next EPG
         if getAddonSetting('epgtimer_interval', sType=NUM) > 0:
             __dayDelta = int(__curTime.strftime('%j')) % getAddonSetting('epgtimer_interval', sType=NUM)
             __epg = __curTime + datetime.timedelta(days=__dayDelta)
             self.wakeEPG = self.local_to_utc_datetime(__epg.replace(hour=getAddonSetting('epgtimer_time', sType=NUM),
                                                                     minute=0, second=0, microsecond=0))
             flags |= isRES
+        else:
+            self.wakeEPG = None
         return flags
 
     def getSysState(self):
@@ -138,12 +142,15 @@ class Manager(object):
 
         # Check for PVR events
         _flags |= self.get_pvr_events(_flags)
-        if self.wakeREC:
-            if __curTime + datetime.timedelta(seconds=getAddonSetting('margin_start', sType=NUM) +
-                    getAddonSetting('margin_stop', sType=NUM)) >= self.wakeREC: _flags |= isREC
+        if self.wakeREC and (self.wakeREC - __curTime).seconds < \
+                getAddonSetting('margin_start', sType=NUM) + getAddonSetting('margin_stop', sType=NUM):
+            _flags |= isREC
+            writeLog(self.rndProcNum, 'Next timer starts immediately (%s)' % str(self.wakeREC))
         if self.wakeEPG:
             if self.wakeEPG <= __curTime <= self.wakeEPG + \
-                    datetime.timedelta(minutes=getAddonSetting('epgtimer_duration', sType=NUM)): _flags |= isEPG
+                    datetime.timedelta(minutes=getAddonSetting('epgtimer_duration', sType=NUM)):
+                _flags |= isEPG
+                writeLog('EPG scan currently running')
 
         # Check if any watched process is running
         if getAddonSetting('postprocessor_enable', sType=BOOL):

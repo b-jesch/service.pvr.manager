@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="service.pvr.manager" name="PVR Recording &amp; Power Manager" version="0.0.10" provider-name="Birger Jesch">
+<addon id="service.pvr.manager" name="PVR Recording &amp; Power Manager" version="0.0.11" provider-name="Birger Jesch">
   <requires>
     <import addon="xbmc.python" version="2.25.0" />
     <import addon="xbmc.json" version="7.0.0" />
@@ -13,8 +13,8 @@
     <summary lang="en">PVR Recording &amp; Power Manager</summary>
     <summary lang="de">PVR Recording &amp; Power Manager</summary>
     <summary lang="pl">PVR Recording &amp; Power Manager</summary>
-    <description lang="en">Recording and power management for current active recordings and wakeup procedures for future schedules using JSON-RPC. Prevents shutdown/poweroff the system while an active schedule is running. Delivers optional Emails via SMTP if an automatic scheduled recording ended successfully. Ability to start the system periodically on an user defined cycle and time for e.g. EPG-Updates if there is a longer inactivity time of the system.</description>
-    <description lang="de">Power- und Timer-Management für aktuell laufende Aufnahmen sowie Aufweckmechanismen für spätere timergesteuerte Aufnahmen unter Nutzung von JSON-RPC. Verhindert ein versehentliches Herunterfahren des Systems während einer Aufnahme. Der Dienst versendet optional Emails via SMTP, wenn eine automatische Aufnahme erfolgreich abgeschlossen wurde. Zusätzlich wird das System zyklisch zu einer einstellbaren Zeit aufgeweckt, um z.B das EPG zu aktualisieren.</description>
+    <description lang="en">Recording and power management for current active recordings and wakeup procedures for future schedules using JSON-RPC on a standalone HTPC with TV card and a PVR server. Prevents shutdown/poweroff the system while an active schedule is running. Delivers optional Emails via SMTP if an automatic scheduled recording ended successfully. Ability to start the system periodically on an user defined cycle and time for e.g. EPG-Updates if there is a longer inactivity time of the system.</description>
+    <description lang="de">Power- und Timer-Management für aktuell laufende Aufnahmen sowie Aufweckmechanismen für spätere timergesteuerte Aufnahmen unter Nutzung von JSON-RPC auf einem Standalone-PC mit TV-Karte und PVR-Server. Verhindert ein versehentliches Herunterfahren des Systems während einer Aufnahme. Der Dienst versendet optional Emails via SMTP, wenn eine automatische Aufnahme erfolgreich abgeschlossen wurde. Zusätzlich wird das System zyklisch zu einer einstellbaren Zeit aufgeweckt, um z.B das EPG zu aktualisieren.</description>
     <disclaimer lang="de">Benutzung auf eigene Gefahr. Keine Haftung für nicht gesetzte Timer, nicht durchgeführte Aufnahmen und andere Seiteneffekte!</disclaimer>
     <disclaimer lang="en">Use at your own risk. No liability for not set timers, lack of recording and other side effects!</disclaimer>
     <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
