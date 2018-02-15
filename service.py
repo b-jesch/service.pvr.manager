@@ -150,7 +150,7 @@ class Manager(object):
             if self.wakeEPG <= __curTime <= self.wakeEPG + \
                     datetime.timedelta(minutes=getAddonSetting('epgtimer_duration', sType=NUM)):
                 _flags |= isEPG
-                writeLog('EPG scan currently running')
+                writeLog(self.rndProcNum, 'EPG scan currently running')
 
         # Check if any watched process is running
         if getAddonSetting('postprocessor_enable', sType=BOOL):
