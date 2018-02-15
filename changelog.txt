@@ -2,7 +2,7 @@
 - small Bugfix
 
 0.0.11
-- Timer calculations improved
+- Time calculations improvements
 
 0.0.9
 - Bugfix in shutdown wrapper script
