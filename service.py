@@ -142,7 +142,7 @@ class Manager(object):
 
         # Check for PVR events
         _flags |= self.get_pvr_events(_flags)
-        if self.wakeREC and (self.wakeREC - __curTime).seconds < \
+        if self.wakeREC and (__curTime - self.wakeREC).seconds < \
                 getAddonSetting('margin_start', sType=NUM) + getAddonSetting('margin_stop', sType=NUM):
             _flags |= isREC
             writeLog(self.rndProcNum, 'Next timer starts immediately (%s)' % str(self.wakeREC))

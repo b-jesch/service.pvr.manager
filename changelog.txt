@@ -1,3 +1,6 @@
+0.0.13
+- Bugfix for undetected start of recording
+
 0.0.12
 - small Bugfix
 
