@@ -13,6 +13,8 @@ SHUTDOWN_CMD = xbmc.translatePath(os.path.join(PATH, 'resources', 'lib', 'shutdo
 SHUTDOWN_METHOD = [LS(30012), LS(30013), LS(30025)]
 EXTGRABBER = xbmc.translatePath(os.path.join(PATH, 'resources', 'lib', 'epggrab_ext.sh'))
 
+ACTION_SELECT = 7
+
 osv = release()
 writeLog(None, 'OS ID is %s' % (osv['osid']))
 
@@ -37,6 +39,23 @@ isPRG = 0b00100     # Programs/Processes are active
 isREC = 0b00010     # Recording is or becomes active
 isEPG = 0b00001     # EPG grabbing is active
 isUSR = 0b00000     # User is active
+
+
+class KeyMonitor(xbmcgui.WindowDialog):
+
+    abort = False
+    procNum = None
+
+    def __init__(self, *args):
+        self.procNum = args[0]
+        writeLog(self.procNum, 'create KeyMonitor object')
+        xbmcgui.WindowDialog.__init__(self)
+        self.show()
+
+    def onAction(self, action):
+        writeLog(self.procNum, 'Keypress detected: %s' % action)
+        if action == ACTION_SELECT: self.abort = True
+
 
 class Manager(object):
 
@@ -234,8 +253,9 @@ class Manager(object):
             writeLog(self.rndProcNum, 'Showing additional notification')
             notify(LS(30010), LS(30011) % (__counter))
 
-        # show countdown
+        # show countdown, init KeyMonitor
 
+        keymon = KeyMonitor(self.rndProcNum)
         writeLog(self.rndProcNum, 'Display countdown dialog for %s secs' % __counter)
         pb = xbmcgui.DialogProgressBG()
         pb.create(LS(30010), LS(30011) % __counter)
@@ -247,14 +267,17 @@ class Manager(object):
             __percent = int(__bar * 100 / __counter)
             pb.update(__percent, LS(30010), LS(30011) % (__counter - __bar))
 
-            if __idleTime > xbmc.getGlobalIdleTime():
+            # if __idleTime > xbmc.getGlobalIdleTime():
+            if keymon.abort:
                 writeLog(self.rndProcNum, 'Countdown aborted by user', level=xbmc.LOGNOTICE)
+                keymon.close()
                 pb.close()
                 return True
 
             xbmc.sleep(1000)
             __idleTime += 1
             __bar +=1
+        keymon.close()
         pb.close()
         return False
 

@@ -58,7 +58,7 @@ msgid "Shutdown in Progress"
 msgstr ""
 
 msgctxt "#30011"
-msgid "System will shut down in %s seconds."
+msgid "%s seconds remaining. Press OK to abort."
 msgstr ""
 
 msgctxt "#30012"

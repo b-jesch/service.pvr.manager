@@ -58,8 +58,8 @@ msgid "Shutdown in Progress"
 msgstr "Initialisiere Abschaltung"
 
 msgctxt "#30011"
-msgid "System will shut down in %s seconds."
-msgstr "System wird in %s Sekunden abgeschalten."
+msgid "%s seconds remaining. Press OK to abort."
+msgstr "%s Sekunden verbleibend. Zum Abbrechen OK drücken."
 
 msgctxt "#30012"
 msgid "Kodi"
