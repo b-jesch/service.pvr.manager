@@ -1,3 +1,6 @@
+0.0.14
+- Bugfix: Prevent wakeup on disabled timers
+
 0.0.13
 - changing abort event on shutdown from detecting user activity to a defined key (select)
 
