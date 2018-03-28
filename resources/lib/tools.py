@@ -48,8 +48,11 @@ def release():
     if coll['platform'] == 'Linux':
         with open('/etc/os-release', 'r') as _file:
             for _line in _file:
-                parameter, value = _line.split('=')
-                item[parameter] = value.replace('"', '').strip()
+                try:
+                    parameter, value = _line.split('=')
+                    item[parameter] = value.replace('"', '').strip()
+                except ValueError:
+                    item[parameter] = 'n.a.'
 
     coll.update({'osname': item.get('NAME', ''), 'osid': item.get('ID', ''), 'osversion': item.get('VERSION_ID', '')})
     return coll
