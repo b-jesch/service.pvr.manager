@@ -15,11 +15,11 @@ import smtplib
 from email.message import Message
 from dateutil import parser
 
-
-ADDON_NAME = xbmcaddon.Addon().getAddonInfo('name')
-PATH = xbmcaddon.Addon().getAddonInfo('path')
-PROFILE = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))
-LS = xbmcaddon.Addon().getLocalizedString
+ADDON = xbmcaddon.Addon()
+ADDON_NAME = ADDON.getAddonInfo('name')
+PATH = ADDON.getAddonInfo('path')
+PROFILE = xbmc.translatePath(ADDON.getAddonInfo('profile'))
+LS = ADDON.getLocalizedString
 
 # Constants
 
@@ -32,8 +32,8 @@ def writeLog(proc, message, level=xbmc.LOGDEBUG):
         proc ='@%s' % (proc)
     else:
         proc = ''
-    xbmc.log('[%s %s%s] %s' % (xbmcaddon.Addon().getAddonInfo('id'),
-                             xbmcaddon.Addon().getAddonInfo('version'),
+    xbmc.log('[%s %s%s] %s' % (ADDON.getAddonInfo('id'),
+                             ADDON.getAddonInfo('version'),
                              proc,
                              message.encode('utf-8')), level)
 
@@ -91,14 +91,14 @@ def jsonrpc(query):
 
 def getAddonSetting(setting, sType=STRING, multiplicator=1):
     if sType == BOOL:
-        return  True if xbmcaddon.Addon().getSetting(setting).upper() == 'TRUE' else False
+        return  True if ADDON.getSetting(setting).upper() == 'TRUE' else False
     elif sType == NUM:
         try:
-            return int(re.match('\d+', xbmcaddon.Addon().getSetting(setting)).group()) * multiplicator
+            return int(re.match('\d+', ADDON.getSetting(setting)).group()) * multiplicator
         except AttributeError:
             return 0
     else:
-        return xbmcaddon.Addon().getSetting(setting)
+        return ADDON.getSetting(setting)
 
         # send email to user to inform about a successful completition
 

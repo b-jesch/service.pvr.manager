@@ -19,7 +19,7 @@ osv = release()
 writeLog(None, 'OS ID is %s' % (osv['osid']))
 
 if ('libreelec' or 'openelec') in osv['osid'] and getAddonSetting('sudo', sType=BOOL):
-    xbmcaddon.Addon().setSetting('sudo', 'false')
+    ADDON.setSetting('sudo', 'false')
     writeLog(None, 'Reset wrong setting \'sudo\' to False')
 
 # set permissions for these files, required after installation or update
