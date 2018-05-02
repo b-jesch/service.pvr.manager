@@ -4,8 +4,8 @@
 	<category label="30050">
 		<setting id="conn_attempts" type="labelenum" label="30004" values="1|2|3|4|5|6|7|8|9" default="5" />
 		<setting id="separator" type="sep" />
-		<setting id="margin_start" type="labelenum" label="30000" values="30 sec|60 sec|90 sec|120 sec" default="60 sec" />
-		<setting id="margin_stop" type="labelenum" label="30001" values="30 sec|60 sec|90 sec|120 sec" default="60 sec" />
+		<setting id="margin_start" type="labelenum" label="30000" values="15 sec|30 sec|60 sec|90 sec|120 sec" default="30 sec" />
+		<setting id="margin_stop" type="labelenum" label="30001" values="15 sec|30 sec|60 sec|90 sec|120 sec" default="30 sec" />
 		<setting id="notification_counter" type="labelenum" label="30003" values="15 sec|30 sec|45 sec|60 sec|90 sec|120 sec" default="60 sec" />
 		<setting id="shutdown_method" type="enum" label="30008" lvalues="30012|30013|30025" default="0"/>
 		<setting id="sudo" type="bool" label="30009" default="true" />

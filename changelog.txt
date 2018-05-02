@@ -1,3 +1,6 @@
+0.0.16
+- Some setting defaults redefined
+
 0.0.15
 - Bugfix: Handle empty values in os-release on some platforms
 

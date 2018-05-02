@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="service.pvr.manager" name="PVR Recording &amp; Power Manager" version="0.0.15" provider-name="Birger Jesch">
+<addon id="service.pvr.manager" name="PVR Recording &amp; Power Manager" version="0.0.16" provider-name="Birger Jesch">
   <requires>
     <import addon="xbmc.python" version="2.25.0" />
     <import addon="xbmc.json" version="7.0.0" />
@@ -23,6 +23,7 @@
     <email>birger.jesch@gmail.com</email>
     <source>https://github.com/b-jesch/service.pvr.manager</source>
     <news>
+0.0.16 Some setting defaults redefined
 0.0.15 Bugfix: Handle empty values in os-release on some platforms
 0.0.14 Bugfix: prevent wakeup on disabled timers
 0.0.13 changing abort event on shutdown from detecting user activity to a defined key (select)
