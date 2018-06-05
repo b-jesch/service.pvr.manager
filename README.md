@@ -1,7 +1,7 @@
-service.tvh.manager
+service.pvr.manager
 ===================
 
-Addon for 'PVR Timer- and Powermanagement' for XBMC/Kodi. This addon turns your vanilla Kodi on a Linux installation (pure Linux, Kodibuntu, Open-/LibreELEC) into a full featured video recorder.
+Addon for 'PVR Timer- and Powermanagement' for Kodi. This addon turns your vanilla Kodi on a Linux installation (pure Linux, Kodibuntu, Open-/LibreELEC) into a full featured video recorder.
 
 This addon handles poweroff management for current active recordings and wakeup procedures for future schedules using the JSON-RPC-Interface of Kodi. The addon starts and shut down the htpc if a recording is scheduled. It delivers optional Emails via SMTP if an automatic scheduled Recording ended successfully.
 

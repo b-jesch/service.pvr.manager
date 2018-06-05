@@ -1,3 +1,7 @@
+0.0.17
+- Ignore timers if they are in the past (VDR)
+- Add suspend option in shutdown method by OS
+
 0.0.16
 - Some setting defaults redefined
 

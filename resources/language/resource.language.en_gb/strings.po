@@ -26,7 +26,7 @@ msgid "Poweroff management for current active recordings and wakeup procedures f
 msgstr ""
 
 msgctxt "#30000"
-msgid "Booting Time until System is ready"
+msgid "Minimum Booting Time until System is ready"
 msgstr ""
 
 msgctxt "#30001"
@@ -39,6 +39,14 @@ msgstr ""
 
 msgctxt "#30004"
 msgid "Connection attempts to PVR before giving up"
+msgstr ""
+
+msgctxt "#30005"
+msgid "Shutdown Method"
+msgstr ""
+
+msgctxt "#30006"
+msgid "Power off"
 msgstr ""
 
 msgctxt "#30007"
@@ -66,7 +74,7 @@ msgid "Kodi"
 msgstr ""
 
 msgctxt "#30013"
-msgid "OS (Power off, Linux only)"
+msgid "OS (Linux only)"
 msgstr ""
 
 msgctxt "#30014"
@@ -117,7 +125,11 @@ msgctxt "#30025"
 msgid "Y.A.R.D.2 RTC"
 msgstr ""
 
-#empty strings from id 30026 to 30029
+msgctxt "#30026"
+msgid "Suspend"
+msgstr ""
+
+#empty strings from id 30027 to 30029
 
 msgctxt "#30030"
 msgid "Communication Error"

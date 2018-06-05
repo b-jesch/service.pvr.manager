@@ -7,11 +7,25 @@ case "$2" in
     ;;
     1)
         echo $1 > /sys/class/rtc/rtc0/wakealarm
-        shutdown -h now "PVR Manager shutdown the system"
+        case "$3" in
+            0)
+            shutdown -h now "PVR Manager shutdown the system"
+            ;;
+            1)
+            systemctl suspend
+            ;;
+        esac
     ;;
     2)
         yard2wakeup -l $1
-        shutdown -h now "PVR Manager shutdown the system"
+        case "$3" in
+            0)
+            shutdown -h now "PVR Manager shutdown the system"
+            ;;
+            1)
+            systemctl suspend
+            ;;
+        esac
     ;;
 esac
 sleep 1

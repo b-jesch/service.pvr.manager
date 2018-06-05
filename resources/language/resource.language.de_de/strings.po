@@ -26,8 +26,8 @@ msgid "Poweroff management for current active recordings and wakeup procedures f
 msgstr "PowerOff-Management für aktuell laufende Aufnahmen und Aufweckmechanismen für spätere timergesteuerte Aufnahmen unter Nutzung des XML-Interfaces von TVHeadend. Das Plugin versendet optional Emails via SMTP, wenn eine automatische Aufnahme erfolgreich abgeschlossen wurde. Zusätzlich wird das System zyklisch zu einer einstellbaren Zeit aufgeweckt, um z.B das EPG zu aktualisieren."
 
 msgctxt "#30000"
-msgid "Booting Time until System is ready"
-msgstr "maximale Bootdauer bis System aufnahmebereit"
+msgid "Minimum Booting Time until System is ready"
+msgstr "Mindest-Bootdauer bis System aufnahmebereit"
 
 msgctxt "#30001"
 msgid "Time for Shutdown"
@@ -40,6 +40,14 @@ msgstr "Anzeigedauer für Abschalthinweis"
 msgctxt "#30004"
 msgid "Connection attempts to PVR before giving up"
 msgstr "Anzahl Verbindungsversuche zum PVR-Client"
+
+msgctxt "#30005"
+msgid "Shutdown Method"
+msgstr "Abschaltmethode"
+
+msgctxt "#30006"
+msgid "Power off"
+msgstr "Ausschalten"
 
 msgctxt "#30007"
 msgid "Show Info about next schedule at shutdown"
@@ -66,8 +74,8 @@ msgid "Kodi"
 msgstr "Kodi"
 
 msgctxt "#30013"
-msgid "OS (Power off, Linux only)"
-msgstr "OS (Ausschalten, nur Linux)"
+msgid "OS (Linux only)"
+msgstr "OS (nur Linux)"
 
 msgctxt "#30014"
 msgid "No wakeup timer is set"
@@ -116,6 +124,10 @@ msgstr "Setze nächsten Timer am"
 msgctxt "#30025"
 msgid "Y.A.R.D.2 RTC"
 msgstr "Y.A.R.D.2 RTC"
+
+msgctxt "#30026"
+msgid "Suspend"
+msgstr "Bereitschaft"
 
 msgctxt "#30030"
 msgid "Communication Error"

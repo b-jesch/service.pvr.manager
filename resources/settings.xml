@@ -7,8 +7,9 @@
 		<setting id="margin_start" type="labelenum" label="30000" values="15 sec|30 sec|60 sec|90 sec|120 sec" default="30 sec" />
 		<setting id="margin_stop" type="labelenum" label="30001" values="15 sec|30 sec|60 sec|90 sec|120 sec" default="30 sec" />
 		<setting id="notification_counter" type="labelenum" label="30003" values="15 sec|30 sec|45 sec|60 sec|90 sec|120 sec" default="60 sec" />
-		<setting id="shutdown_method" type="enum" label="30008" lvalues="30012|30013|30025" default="0"/>
-		<setting id="sudo" type="bool" label="30009" default="true" />
+		<setting id="shutdown_method" type="enum" label="30008" lvalues="30012|30013|30025" default="0" />
+		<setting id="sudo" type="bool" label="30009" default="true" enable="eq(-1,1)" />
+		<setting id="shutdown_mode" type="enum" label="30005" lvalues="30006|30026" default="0" enable="eq(-2,1)" />
 		<setting id="separator" type="sep" />
         <setting id="next_schedule" type="bool" label="30007" default="false" />
 		<setting id="separator" type="sep" />

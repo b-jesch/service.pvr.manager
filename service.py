@@ -11,6 +11,7 @@ JSON_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 SHUTDOWN_CMD = xbmc.translatePath(os.path.join(PATH, 'resources', 'lib', 'shutdown.sh'))
 SHUTDOWN_METHOD = [LS(30012), LS(30013), LS(30025)]
+SHUTDOWN_MODE = [LS(30006), LS(30026)]
 EXTGRABBER = xbmc.translatePath(os.path.join(PATH, 'resources', 'lib', 'epggrab_ext.sh'))
 
 ACTION_SELECT = 7
@@ -134,7 +135,8 @@ class Manager(object):
             response = jsonrpc(query)
             if response is not None and response.get('timers', False) and not (flags & isREC):
                 for timer in response.get('timers'):
-                    if timer['istimerrule'] or timer['state'] == 'disabled': continue
+                    if timer['istimerrule'] or timer['state'] == 'disabled' or \
+                            strpTimeBug(timer['starttime'], JSON_TIME_FORMAT) < __curTime: continue
                     self.wakeREC = strpTimeBug(timer['starttime'], JSON_TIME_FORMAT) -  \
                     datetime.timedelta(minutes=timer['startmargin'],
                                        seconds=getAddonSetting('margin_start', sType=NUM))
@@ -289,14 +291,17 @@ class Manager(object):
 
         _flags = self.calcNextSched()
         _utc = int(time.mktime(self.utc_to_local_datetime(self.wakeUTC).timetuple()))
-        writeLog(self.rndProcNum, 'Instruct the system to shut down using %s' %
-                 (SHUTDOWN_METHOD[getAddonSetting('shutdown_method', sType=NUM)]), xbmc.LOGNOTICE)
+        writeLog(self.rndProcNum, 'Instruct the system to shut down using %s: %s' %
+                 (SHUTDOWN_METHOD[getAddonSetting('shutdown_method', sType=NUM)],
+                  SHUTDOWN_MODE[getAddonSetting('shutdown_mode', sType=NUM)]), xbmc.LOGNOTICE)
         writeLog(self.rndProcNum, 'Wake-Up Unix timestamp: %s' % (_utc), xbmc.LOGNOTICE)
         writeLog(self.rndProcNum, 'Flags on resume points will be later {0:05b}'.format(_flags))
 
         if osv['platform'] == 'Linux':
             sudo = 'sudo ' if getAddonSetting('sudo', sType=BOOL) else ''
-            os.system('%s%s %s %s' % (sudo, SHUTDOWN_CMD, _utc, getAddonSetting('shutdown_method', sType=NUM)))
+            os.system('%s%s %s %s %s' % (sudo, SHUTDOWN_CMD, _utc,
+                                         getAddonSetting('shutdown_method', sType=NUM),
+                                         getAddonSetting('shutdown_mode', sType=NUM)))
         if getAddonSetting('shutdown_method', sType=NUM) == 0 or osv['platform'] == 'Windows': xbmc.shutdown()
         xbmc.sleep(1000)
 
