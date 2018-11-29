@@ -127,8 +127,7 @@ class Manager(object):
             query = {'method': 'PVR.GetProperties',
                      'params': {'properties': ['recording']}}
             response = jsonrpc(query)
-            if response is not None and response.get('recording', False): flags |= isREC
-
+            if response is not None and bool(response.get('recording', False)): flags |= isREC
             # Check for timers
             query = {'method': 'PVR.GetTimers',
                      'params': {'properties': ['starttime', 'startmargin', 'istimerrule', 'state']}}
@@ -136,12 +135,17 @@ class Manager(object):
             if response is not None and response.get('timers', False) and not (flags & isREC):
                 for timer in response.get('timers'):
                     if timer['istimerrule'] or timer['state'] == 'disabled' or \
-                            strpTimeBug(timer['starttime'], JSON_TIME_FORMAT) < __curTime: continue
+                            (strpTimeBug(timer['starttime'], JSON_TIME_FORMAT)  < __curTime): continue
                     self.wakeREC = strpTimeBug(timer['starttime'], JSON_TIME_FORMAT) -  \
                     datetime.timedelta(minutes=timer['startmargin'],
                                        seconds=getAddonSetting('margin_start', sType=NUM))
-                    flags |= isRES
-                    writeLog(self.rndProcNum, 'No active timers yet, prepare timer@%s' % (self.wakeREC.strftime(JSON_TIME_FORMAT)))
+                    if (__curTime - self.wakeREC).seconds < getAddonSetting('margin_start', sType=NUM) + \
+                            getAddonSetting('margin_stop', sType=NUM):
+                        flags |= isREC
+                        writeLog(self.rndProcNum, 'Next recording starts in %s secs' % ((__curTime -self.wakeREC).seconds))
+                    else:
+                        flags |= isRES
+                        writeLog(self.rndProcNum, 'No active timers yet, prepare timer@%s' % (self.wakeREC.strftime(JSON_TIME_FORMAT)))
                     break
             else:
                 self.wakeREC = None
@@ -152,7 +156,12 @@ class Manager(object):
             __epg = __curTime + datetime.timedelta(days=__dayDelta)
             self.wakeEPG = self.local_to_utc_datetime(__epg.replace(hour=getAddonSetting('epgtimer_time', sType=NUM),
                                                                     minute=0, second=0, microsecond=0))
-            flags |= isRES
+            if self.wakeEPG <= __curTime <= self.wakeEPG + \
+                    datetime.timedelta(minutes=getAddonSetting('epgtimer_duration', sType=NUM)):
+                flags |= isEPG
+                writeLog(self.rndProcNum, 'EPG scan currently running')
+            else:
+                flags |= isRES
         else:
             self.wakeEPG = None
         return flags
@@ -163,15 +172,6 @@ class Manager(object):
 
         # Check for PVR events
         _flags |= self.get_pvr_events(_flags)
-        if self.wakeREC and (self.wakeREC - __curTime).seconds < \
-                getAddonSetting('margin_start', sType=NUM) + getAddonSetting('margin_stop', sType=NUM):
-            _flags |= isREC
-            writeLog(self.rndProcNum, 'Next timer starts immediately (%s)' % str(self.wakeREC))
-        if self.wakeEPG:
-            if self.wakeEPG <= __curTime <= self.wakeEPG + \
-                    datetime.timedelta(minutes=getAddonSetting('epgtimer_duration', sType=NUM)):
-                _flags |= isEPG
-                writeLog(self.rndProcNum, 'EPG scan currently running')
 
         # Check if any watched process is running
         if getAddonSetting('postprocessor_enable', sType=BOOL):

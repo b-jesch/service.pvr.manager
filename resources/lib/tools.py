@@ -32,10 +32,8 @@ def writeLog(proc, message, level=xbmc.LOGDEBUG):
         proc ='@%s' % (proc)
     else:
         proc = ''
-    xbmc.log('[%s %s%s] %s' % (ADDON.getAddonInfo('id'),
-                             ADDON.getAddonInfo('version'),
-                             proc,
-                             message.encode('utf-8')), level)
+    xbmc.log('[%s %s%s] %s' % (ADDON.getAddonInfo('id'), ADDON.getAddonInfo('version'), proc, message.encode('utf-8')), level)
+
 
 
 def notify(header, message, icon=xbmcgui.NOTIFICATION_INFO, dispTime=5000):
