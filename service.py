@@ -293,9 +293,12 @@ class Manager(object):
         _flags = self.calcNextSched()
 
         # consider wakeup margin
-        self.wakeUTC -= datetime.timedelta(seconds=getAddonSetting('margin_start', sType=NUM))
+        if self.wakeUTC is not None:
+            self.wakeUTC -= datetime.timedelta(seconds=getAddonSetting('margin_start', sType=NUM))
+            _utc = int(time.mktime(self.utc_to_local_datetime(self.wakeUTC).timetuple()))
+        else:
+            _utc = 0
 
-        _utc = int(time.mktime(self.utc_to_local_datetime(self.wakeUTC).timetuple()))
         writeLog(self.rndProcNum, 'Instruct the system to shut down using %s: %s' %
                  (SHUTDOWN_METHOD[getAddonSetting('shutdown_method', sType=NUM)],
                   SHUTDOWN_MODE[getAddonSetting('shutdown_mode', sType=NUM)]), xbmc.LOGNOTICE)
