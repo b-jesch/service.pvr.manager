@@ -1,3 +1,6 @@
+0.0.19
+- some modifications on time calculation for recording/EPG schedules
+
 0.0.17
 - Ignore timers if they are in the past (VDR)
 - Add suspend option in shutdown method by OS

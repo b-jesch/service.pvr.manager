@@ -127,28 +127,29 @@ class Manager(object):
             query = {'method': 'PVR.GetProperties',
                      'params': {'properties': ['recording']}}
             response = jsonrpc(query)
-            if response is not None and bool(response.get('recording', False)): flags |= isREC
-            # Check for timers
-            query = {'method': 'PVR.GetTimers',
-                     'params': {'properties': ['starttime', 'startmargin', 'istimerrule', 'state']}}
-            response = jsonrpc(query)
-            if response is not None and response.get('timers', False) and not (flags & isREC):
-                for timer in response.get('timers'):
-                    if timer['istimerrule'] or timer['state'] == 'disabled' or \
-                            (strpTimeBug(timer['starttime'], JSON_TIME_FORMAT)  < __curTime): continue
-                    self.wakeREC = strpTimeBug(timer['starttime'], JSON_TIME_FORMAT) -  \
-                    datetime.timedelta(minutes=timer['startmargin'],
-                                       seconds=getAddonSetting('margin_start', sType=NUM))
-                    if (__curTime - self.wakeREC).seconds < getAddonSetting('margin_start', sType=NUM) + \
-                            getAddonSetting('margin_stop', sType=NUM):
-                        flags |= isREC
-                        writeLog(self.rndProcNum, 'Next recording starts in %s secs' % ((__curTime -self.wakeREC).seconds))
-                    else:
-                        flags |= isRES
-                        writeLog(self.rndProcNum, 'No active timers yet, prepare timer@%s' % (self.wakeREC.strftime(JSON_TIME_FORMAT)))
-                    break
+            if response is not None and bool(response.get('recording', False)):
+                flags |= isREC
             else:
-                self.wakeREC = None
+                # Check for timers
+                query = {'method': 'PVR.GetTimers',
+                         'params': {'properties': ['starttime', 'startmargin', 'istimerrule', 'state']}}
+                response = jsonrpc(query)
+                if response is not None and response.get('timers', False):
+                    for timer in response.get('timers'):
+                        if timer['istimerrule'] or timer['state'] == 'disabled' or \
+                                (strpTimeBug(timer['starttime'], JSON_TIME_FORMAT)  < __curTime): continue
+                        self.wakeREC = strpTimeBug(timer['starttime'], JSON_TIME_FORMAT) - \
+                        datetime.timedelta(minutes=timer['startmargin'])
+                        if (self.wakeREC - __curTime).seconds < \
+                                (getAddonSetting('margin_start', sType=NUM) + getAddonSetting('margin_stop', sType=NUM)):
+                            flags |= isREC
+                            writeLog(self.rndProcNum, 'Next recording starts in %s secs' % ((self.wakeREC - __curTime).seconds))
+                        else:
+                            flags |= isRES
+                            writeLog(self.rndProcNum, 'No active timers yet, prepare timer@%s' % (self.wakeREC.strftime(JSON_TIME_FORMAT)))
+                        break
+                else:
+                    self.wakeREC = None
 
         # Calculate next EPG
         if getAddonSetting('epgtimer_interval', sType=NUM) > 0:
@@ -290,6 +291,10 @@ class Manager(object):
             xbmc.Player().stop()
 
         _flags = self.calcNextSched()
+
+        # consider wakeup margin
+        self.wakeUTC -= datetime.timedelta(seconds=getAddonSetting('margin_start', sType=NUM))
+
         _utc = int(time.mktime(self.utc_to_local_datetime(self.wakeUTC).timetuple()))
         writeLog(self.rndProcNum, 'Instruct the system to shut down using %s: %s' %
                  (SHUTDOWN_METHOD[getAddonSetting('shutdown_method', sType=NUM)],
