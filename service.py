@@ -157,10 +157,9 @@ class Manager(object):
             __epg = __curTime + datetime.timedelta(days=__dayDelta)
             self.wakeEPG = self.local_to_utc_datetime(__epg.replace(hour=getAddonSetting('epgtimer_time', sType=NUM),
                                                                     minute=0, second=0, microsecond=0))
-            if self.wakeEPG <= __curTime <= self.wakeEPG + \
-                    datetime.timedelta(minutes=getAddonSetting('epgtimer_duration', sType=NUM)):
+            if self.wakeEPG - datetime.timedelta(seconds=getAddonSetting('margin_start', sType=NUM)) <= \
+                    __curTime <= self.wakeEPG + datetime.timedelta(minutes=getAddonSetting('epgtimer_duration', sType=NUM)):
                 flags |= isEPG
-                writeLog(self.rndProcNum, 'EPG scan currently running')
             else:
                 flags |= isRES
         else:

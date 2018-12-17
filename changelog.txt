@@ -1,3 +1,6 @@
+0.0.20
+- Bug fixed in time calculation for EPG scheduler
+
 0.0.19
 - some modifications on time calculation for recording/EPG schedules
 
