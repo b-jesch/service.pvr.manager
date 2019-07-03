@@ -37,10 +37,10 @@
 	<category label="30053">
 		<setting id="epgtimer_interval" type="enum" label="30061" lvalues="30100|30101|30102|30103|30104|30105|30106|30107" default="2" />
 		<setting id="epgtimer_time" type="enum" label="30062" lvalues="30070|30071|30072|30073|30074|30075|30076|30077|30078|30079|30080|30081|30082|30083|30084|30085|30086|30087|30088|30089|30090|30091|30092|30093|" default="3" />
-		<setting id="epgtimer_duration" type="labelenum" label="30063" values="10 min|15 min|20 min|25 min|30 min|35 min|40 min|45 min" default="20 min" />
+		<setting id="epgtimer_duration" type="labelenum" label="30063" values="10 min|20 min|30 min|40 min|50 min|60 min|70 min|80 min|90 min" default="20 min" />
 		<setting id="separator" type="sep" />
 		<setting id="epg_grab_ext" type="bool" label="30060" default="false" />
-		<setting id="epg_socket_path" type="text" label="30058" default="/home/hts/.hts/tvheadend/epggrab/pyepg.sock" enable="eq(-1,true)" />
+		<setting id="epg_socket_path" type="text" label="30058" default="/storage/.kodi/userdata/addon_data/service.tvheadend42/epggrab/xmltv.sock" enable="eq(-1,true)" />
 		<setting id="store_epg" type="bool" label="30064" default="false" enable="eq(-2,true)" />
 		<setting id="epg_path" type="folder" label="30059" option="writeable" enable="eq(-3,true) + eq(-1,true)" />
 	</category>

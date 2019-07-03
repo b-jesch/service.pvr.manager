@@ -222,7 +222,7 @@ msgstr ""
 #empty strings from id 30055 to 30057
 
 msgctxt "#30058"
-msgid "PyEPG/XMLTV socket"
+msgid "Path to XMLTV socket"
 msgstr ""
 
 msgctxt "#30059"
@@ -230,7 +230,7 @@ msgid "Store epg.xml in folder"
 msgstr ""
 
 msgctxt "#30060"
-msgid "Grab EPG Data from external Provider (XMLTV)"
+msgid "Use internal EPG Grabber Script (XMLTV)"
 msgstr ""
 
 msgctxt "#30061"
