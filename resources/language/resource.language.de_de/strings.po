@@ -222,8 +222,8 @@ msgid "Store epg.xml in folder"
 msgstr "Datei 'epg.xml' speichern in"
 
 msgctxt "#30060"
-msgid "Grab EPG Data from external Provider (XMLTV)"
-msgstr "Starte  EPG-Daten externer Anbieter (XMLTV)"
+msgid "Use internal EPG Grabber Script (XMLTV)"
+msgstr "Starte internes EPG-Grabber-Skript (XMLTV)"
 
 msgctxt "#30061"
 msgid "Wakeup for EPG Updates"
