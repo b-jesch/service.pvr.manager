@@ -25,10 +25,10 @@ if ('libreelec' or 'openelec') in osv['osid'] and getAddonSetting('sudo', sType=
 
 # set permissions for these files, required after installation or update
 
-_sts = os.stat(SHUTDOWN_CMD)
-_stg = os.stat(EXTGRABBER)
-if not (_sts.st_mode & stat.S_IEXEC): os.chmod(SHUTDOWN_CMD, _sts.st_mode | stat.S_IEXEC)
-if not (_stg.st_mode & stat.S_IEXEC): os.chmod(EXTGRABBER, _stg.st_mode | stat.S_IEXEC)
+_sts = os.stat(SHUTDOWN_CMD).st_mode
+_stg = os.stat(EXTGRABBER).st_mode
+if not (_sts & stat.S_IXOTH): os.chmod(SHUTDOWN_CMD, _sts | stat.S_IXOTH)
+if not (_stg & stat.S_IXOTH): os.chmod(EXTGRABBER, _stg | stat.S_IXOTH)
 
 CYCLE = 30  # polling cycle
 
