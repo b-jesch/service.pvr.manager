@@ -22,13 +22,13 @@ Installation
 
 1.	Install this Addon from ZIP or from Repository
 
-2.	If You are using OpenELEC/LibreELEC, the following step isn’t necessary. Skip to step 3.
+2.	If You are using OpenElec/LibreElec/CoreElec, the following step isn’t necessary. Skip to step 3.
 
-    All others: As the shellscript ‘shutdown.sh’ is a wrapper to poweroff the system, it needs root privileges. We make it possible that ‘shutdown.sh’ runs under root/sudo privileges without needing to type in a password:
+    All others: As the shellscript ‘shutdown.sh’ is a wrapper to poweroff the system, it needs root privileges to run properly. We make it possible that ‘shutdown.sh’ runs under root/sudo privileges without needing to type in a password:
 
 	    sudo visudo
 
-    add below:
+    add at the end of the file:
 	
         Cmnd_Alias PVR_CMDS = /home/kodi/.kodi/addons/service.pvr.manager/resources/lib/shutdown.sh
         kodi ALL=NOPASSWD: PVR_CMDS
