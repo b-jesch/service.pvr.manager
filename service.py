@@ -78,6 +78,7 @@ class Manager(object):
         # PVR server
 
         notify(ADDON_NAME, LS(30027), icon=xbmcgui.NOTIFICATION_INFO, dispTime=3000)
+        xbmc.sleep(3000)
         _attempts = getAddonSetting('conn_attempts', sType=NUM, multiplicator=5)
         while not self.hasPVR and _attempts > 0:
             query = {'method': 'PVR.GetProperties',
@@ -179,12 +180,12 @@ class Manager(object):
 
         # Check for active network connection(s)
         if getAddonSetting('network', sType=BOOL):
-            _port = []
+            _port = list()
             for port in self.__monitored_ports:
                 nwc = subprocess.Popen('netstat -an | grep -iE "(established|verbunden)" | grep -v "127.0.0.1" | grep ":%s "' %
                                        port, stdout=subprocess.PIPE, shell=True).communicate()
                 nwc = nwc[0].strip()
-                if nwc and len(nwc.split('\n')) > 0:
+                if nwc and len(nwc.splitlines()) > 0:
                     _flags |= isNET
                     _port.append(port)
             if _port: writeLog(self.rndProcNum, 'Network on port %s established and active' % (', '.join(_port)))
@@ -385,8 +386,8 @@ class Manager(object):
             except Exception:
                 writeLog(self.rndProcNum, 'Could not start external EPG grabber script', xbmc.LOGERROR)
 
-        tmpTimer = {}
-        pvrTimer = []
+        tmpTimer = dict()
+        pvrTimer = list()
         idle = xbmc.getGlobalIdleTime()
         mon = xbmc.Monitor()
 
@@ -415,7 +416,7 @@ class Manager(object):
 
             # check outdated recordings
 
-            curTimer = []
+            curTimer = list()
             query = {'method': 'PVR.GetTimers',
                      'params': {'properties': ['title', 'state']}}
             response = jsonrpc(query)
