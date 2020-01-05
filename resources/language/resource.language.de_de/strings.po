@@ -129,6 +129,10 @@ msgctxt "#30026"
 msgid "Suspend"
 msgstr "Bereitschaft"
 
+msgctxt "#30027"
+msgid "Checking for PVR Server Presence"
+msgstr "PVR Server Präsenz wird ermittelt"
+
 msgctxt "#30030"
 msgid "Communication Error"
 msgstr "Kommunikationsfehler"

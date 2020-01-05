@@ -77,7 +77,7 @@ class Manager(object):
 
         # PVR server
 
-        _st = int(time.time())
+        notify(ADDON_NAME, LS(30027), icon=xbmcgui.NOTIFICATION_INFO, dispTime=3000)
         _attempts = getAddonSetting('conn_attempts', sType=NUM, multiplicator=5)
         while not self.hasPVR and _attempts > 0:
             query = {'method': 'PVR.GetProperties',
@@ -87,7 +87,6 @@ class Manager(object):
             if self.hasPVR: break
             xbmc.sleep(1000)
             _attempts -= 1
-        writeLog(self.rndProcNum, 'Wait %s seconds for PVR response' % (int(time.time()) - _st))
         if not self.hasPVR:
             writeLog(self.rndProcNum, 'PVR timed out', xbmc.LOGFATAL)
             notify(ADDON_NAME, LS(30032), icon=xbmcgui.NOTIFICATION_WARNING)
@@ -379,7 +378,7 @@ class Manager(object):
                                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                          shell=True, universal_newlines=True)
                 while _comm.poll() is None:
-                    writeLog(self.rndProcNum, _comm.stdout.readline().decode('utf-8', 'ignore').strip())
+                    writeLog(self.rndProcNum, _comm.stdout.readline().strip())
 
                 writeLog(self.rndProcNum, 'external EPG grabber script tooks %s seconds' %
                          ((datetime.datetime.now() - _start).seconds))

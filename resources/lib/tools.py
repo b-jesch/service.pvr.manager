@@ -32,12 +32,12 @@ def writeLog(proc, message, level=xbmc.LOGDEBUG):
         proc ='@%s' % (proc)
     else:
         proc = ''
-    xbmc.log('[%s %s%s] %s' % (ADDON.getAddonInfo('id'), ADDON.getAddonInfo('version'), proc, message.encode('utf-8')), level)
+    xbmc.log('[%s %s%s] %s' % (ADDON.getAddonInfo('id'), ADDON.getAddonInfo('version'), proc, message), level)
 
 
 
 def notify(header, message, icon=xbmcgui.NOTIFICATION_INFO, dispTime=5000):
-    xbmcgui.Dialog().notification(header.encode('utf-8'), message.encode('utf-8'), icon=icon, time=dispTime)
+    xbmcgui.Dialog().notification(header, message, icon=icon, time=dispTime)
 
 
 def release():
@@ -64,7 +64,7 @@ def getProcessPID(process):
     elif OS['platform'] == 'Windows':
         _tlcall = 'TASKLIST', '/FI', 'imagename eq %s' % os.path.basename(process)
         _syscmd = subprocess.Popen(_tlcall, shell=True, stdout=subprocess.PIPE)
-        PID = _syscmd.communicate()[0].strip().split('\r\n')
+        PID = _syscmd.communicate()[0].strip().splitlines()
         if len(PID) > 1 and os.path.basename(process) in PID[-1]:
             return PID[-1].split()[1]
         else: return False
@@ -80,10 +80,10 @@ def jsonrpc(query):
     querystring = {"jsonrpc": "2.0", "id": 1}
     querystring.update(query)
     try:
-        response = json.loads(xbmc.executeJSONRPC(json.dumps(querystring, encoding='utf-8')))
+        response = json.loads(xbmc.executeJSONRPC(json.dumps(querystring)))
         if 'result' in response: return response['result']
-    except TypeError, e:
-        writeLog(None, 'Error executing JSON RPC: %s' % (e.message), xbmc.LOGFATAL)
+    except TypeError as e:
+        writeLog(None, 'Error executing JSON RPC: %s' % (e.args), xbmc.LOGFATAL)
     return None
 
 
@@ -125,9 +125,9 @@ def deliverMail(hostname, message):
             __s_conn.close()
             writeLog(None, 'Mail delivered to %s.' % (getAddonSetting('smtp_to')), level=xbmc.LOGNOTICE)
             return True
-        except Exception, e:
+        except Exception as e:
             writeLog(None, 'Mail could not be delivered. Check your settings.', xbmc.LOGERROR)
-            writeLog(None, e.message)
+            writeLog(None, e.args)
             return False
     return True
 

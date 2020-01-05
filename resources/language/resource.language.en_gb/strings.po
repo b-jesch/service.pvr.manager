@@ -129,6 +129,10 @@ msgctxt "#30026"
 msgid "Suspend"
 msgstr ""
 
+msgctxt "#30027"
+msgid "Checking for PVR Server Presence"
+msgstr ""
+
 #empty strings from id 30027 to 30029
 
 msgctxt "#30030"
