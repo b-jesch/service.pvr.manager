@@ -58,9 +58,9 @@ def getProcessPID(process):
     if not process: return False
     OS = release()
     if OS['platform'] == 'Linux':
-        _syscmd = subprocess.Popen(['pidof', process], stdout=subprocess.PIPE)
+        _syscmd = subprocess.Popen(['pidof', '-x', process], stdout=subprocess.PIPE)
         PID = _syscmd.stdout.read().strip()
-        return PID if PID > 0 else False
+        return PID if bool(PID) else False
     elif OS['platform'] == 'Windows':
         _tlcall = 'TASKLIST', '/FI', 'imagename eq %s' % os.path.basename(process)
         _syscmd = subprocess.Popen(_tlcall, shell=True, stdout=subprocess.PIPE)
