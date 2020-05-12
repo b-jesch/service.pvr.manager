@@ -17,7 +17,7 @@ case "$2" in
         esac
     ;;
     2)
-        yard2wakeup -l $1
+        yard2wakeup -I $1
         case "$3" in
             0)
             shutdown -h now "PVR Manager shutdown the system"

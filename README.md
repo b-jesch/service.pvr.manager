@@ -62,6 +62,18 @@ Installation
 
 4.	Store (CTRL+O, CTRL+X), restart Kodi and enjoy!
 
+5.  Y.A.R.D.2
+
+You have to make sure that your System knows the path to the yard2wakeup executable. Insert this line into the .profile file in your user folder:
+
+    nano ~/.profile
+    
+and add
+
+     PATH="$PATH:$HOME/yard2
+     
+in this case $HONE/yard2 points to the installation folder of yard2wakeup. On *Elec this could be /storage/yard2
+
 ADDITIONAL FOR EXPERTS
 ----------------------
 
