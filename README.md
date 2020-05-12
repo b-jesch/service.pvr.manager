@@ -72,7 +72,7 @@ and add
 
      PATH="$PATH:$HOME/yard2
      
-in this case $HONE/yard2 points to the installation folder of yard2wakeup. On *Elec this could be /storage/yard2
+In this case $HOME/yard2 points to the installation folder of yard2wakeup. On *Elec this could be /storage/yard2
 
 ADDITIONAL FOR EXPERTS
 ----------------------
