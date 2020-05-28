@@ -158,7 +158,7 @@ class Manager(object):
             self.wakeEPG = self.local_to_utc_datetime(__epg.replace(hour=getAddonSetting('epgtimer_time', sType=NUM),
                                                                     minute=0, second=0, microsecond=0))
             if getAddonSetting('epgtimer_interval', sType=NUM) == 1 and self.wakeEPG < __curTime:
-                self.wakeEPG += 86400
+                self.wakeEPG += datetime.timedelta(days=1)
             if self.wakeEPG - datetime.timedelta(seconds=getAddonSetting('margin_start', sType=NUM) + getAddonSetting('margin_stop', sType=NUM)) <= \
                     __curTime <= self.wakeEPG + datetime.timedelta(minutes=getAddonSetting('epgtimer_duration', sType=NUM)):
                 flags |= isEPG
