@@ -1,5 +1,5 @@
 #! /bin/sh
-#
+
 # Please place your command line for grabbing epg-data from external provider here
 # Make sure all grabbers are configured properly and choose the appropriate socket
 # of tvheadend!
