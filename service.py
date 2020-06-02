@@ -19,7 +19,7 @@ ACTION_SELECT = 7
 osv = release()
 writeLog(None, 'OS ID is %s' % (osv['osid']))
 
-if ('libreelec' or 'openelec') in osv['osid'] and getAddonSetting('sudo', sType=BOOL):
+if ('libreelec' or 'openelec' or 'coreelec') in osv['osid'].lower() and getAddonSetting('sudo', sType=BOOL):
     ADDON.setSetting('sudo', 'false')
     writeLog(None, 'Reset wrong setting \'sudo\' to False')
 
@@ -157,7 +157,8 @@ class Manager(object):
             __epg = __curTime + datetime.timedelta(days=__dayDelta)
             self.wakeEPG = self.local_to_utc_datetime(__epg.replace(hour=getAddonSetting('epgtimer_time', sType=NUM),
                                                                     minute=0, second=0, microsecond=0))
-            if getAddonSetting('epgtimer_interval', sType=NUM) == 1 and self.wakeEPG < __curTime:
+            if getAddonSetting('epgtimer_interval', sType=NUM) == 1 and \
+                    self.wakeEPG + datetime.timedelta(minutes=getAddonSetting('epgtimer_duration', sType=NUM)) < __curTime:
                 self.wakeEPG += datetime.timedelta(days=1)
             if self.wakeEPG - datetime.timedelta(seconds=getAddonSetting('margin_start', sType=NUM) + getAddonSetting('margin_stop', sType=NUM)) <= \
                     __curTime <= self.wakeEPG + datetime.timedelta(minutes=getAddonSetting('epgtimer_duration', sType=NUM)):
