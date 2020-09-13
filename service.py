@@ -273,7 +273,7 @@ class Manager(object):
 
             # if __idleTime > xbmc.getGlobalIdleTime():
             if keymon.abort:
-                writeLog(self.rndProcNum, 'Countdown aborted by user', level=xbmc.LOGNOTICE)
+                writeLog(self.rndProcNum, 'Countdown aborted by user', level=xbmc.LOGINFO)
                 keymon.close()
                 pb.close()
                 return True
@@ -302,8 +302,8 @@ class Manager(object):
 
         writeLog(self.rndProcNum, 'Instruct the system to shut down using %s: %s' %
                  (SHUTDOWN_METHOD[getAddonSetting('shutdown_method', sType=NUM)],
-                  SHUTDOWN_MODE[getAddonSetting('shutdown_mode', sType=NUM)]), xbmc.LOGNOTICE)
-        writeLog(self.rndProcNum, 'Wake-Up Unix timestamp: %s' % (_utc), xbmc.LOGNOTICE)
+                  SHUTDOWN_MODE[getAddonSetting('shutdown_mode', sType=NUM)]), xbmc.LOGINFO)
+        writeLog(self.rndProcNum, 'Wake-Up Unix timestamp: %s' % (_utc), xbmc.LOGINFO)
         writeLog(self.rndProcNum, 'Flags on resume points will be later {0:05b}'.format(_flags))
 
         if osv['platform'] == 'Linux':
@@ -330,7 +330,7 @@ class Manager(object):
         if mode is None:
 
             if not (_flags & (isREC | isEPG)):
-                writeLog(self.rndProcNum, 'Service finished', level=xbmc.LOGNOTICE)
+                writeLog(self.rndProcNum, 'Service finished', level=xbmc.LOGINFO)
                 return
 
         elif mode == 'CHECKMAILSETTINGS':
@@ -341,7 +341,7 @@ class Manager(object):
             return
 
         elif mode == 'POWEROFF':
-            writeLog(self.rndProcNum, 'Poweroff command received', level=xbmc.LOGNOTICE)
+            writeLog(self.rndProcNum, 'Poweroff command received', level=xbmc.LOGINFO)
 
             if (_flags & isREC):
                 notify(LS(30015), LS(30020), icon=xbmcgui.NOTIFICATION_WARNING)  # Notify 'Recording in progress'
@@ -361,7 +361,7 @@ class Manager(object):
         # RESUME POINT #1
 
         if (_flags & isRES) and mode == 'POWEROFF':
-            writeLog(self.rndProcNum, 'Resume point #1 passed', xbmc.LOGNOTICE)
+            writeLog(self.rndProcNum, 'Resume point #1 passed', xbmc.LOGINFO)
             _flags = self.getSysState() & (isREC | isEPG | isPRG | isNET)
             if not _flags: return
             # mode = None
@@ -403,7 +403,7 @@ class Manager(object):
             _abort = False
             while outer_loop < CYCLE:
                 if mon.waitForAbort(1):
-                    writeLog(self.rndProcNum, 'Abort request received', level=xbmc.LOGNOTICE)
+                    writeLog(self.rndProcNum, 'Abort request received', level=xbmc.LOGINFO)
                     _abort = True
                     break
                 if idle > xbmc.getGlobalIdleTime():
@@ -446,12 +446,12 @@ class Manager(object):
                     if self.countDown(counter=getAddonSetting('notification_counter', sType=NUM)): break
                     _flags = self.setWakeup()
                 else:
-                    writeLog(self.rndProcNum, 'Service was running w/o user activity', level=xbmc.LOGNOTICE)
+                    writeLog(self.rndProcNum, 'Service was running w/o user activity', level=xbmc.LOGINFO)
                     _flags = self.setWakeup()
 
                 # RESUME POINT #2
 
-                writeLog(self.rndProcNum, 'Resume point #2 passed', xbmc.LOGNOTICE)
+                writeLog(self.rndProcNum, 'Resume point #2 passed', xbmc.LOGINFO)
                 mode = None
                 idle = 0
                 _flags = self.getSysState() & (isREC | isEPG | isPRG | isNET)
@@ -472,5 +472,5 @@ if __name__ == '__main__':
 
     TVHMan = Manager()
     TVHMan.start(mode)
-    writeLog(None, 'Service with id %s on %s kicks off' % (TVHMan.rndProcNum, osv['hostname']), level=xbmc.LOGNOTICE)
+    writeLog(None, 'Service with id %s on %s kicks off' % (TVHMan.rndProcNum, osv['hostname']), level=xbmc.LOGINFO)
     del TVHMan

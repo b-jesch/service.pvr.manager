@@ -123,7 +123,7 @@ def deliverMail(hostname, message):
             __s_conn.login(getAddonSetting('smtp_user'), getAddonSetting('smtp_passwd'))
             __s_conn.sendmail(getAddonSetting('smtp_from'), getAddonSetting('smtp_to'), __s_msg.as_string())
             __s_conn.close()
-            writeLog(None, 'Mail delivered to %s.' % (getAddonSetting('smtp_to')), level=xbmc.LOGNOTICE)
+            writeLog(None, 'Mail delivered to %s.' % (getAddonSetting('smtp_to')), level=xbmc.LOGINFO)
             return True
         except Exception as e:
             writeLog(None, 'Mail could not be delivered. Check your settings.', xbmc.LOGERROR)
