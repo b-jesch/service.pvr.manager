@@ -19,7 +19,7 @@ ACTION_SELECT = 7
 osv = release()
 writeLog(None, 'OS ID is %s' % (osv['osid']))
 
-if ('libreelec' or 'openelec' or 'coreelec') in osv['osid'].lower() and getAddonSetting('sudo', sType=BOOL):
+if ('libreelec' or 'openelec') in osv['osid'].lower() and getAddonSetting('sudo', sType=BOOL):
     ADDON.setSetting('sudo', 'false')
     writeLog(None, 'Reset wrong setting \'sudo\' to False')
 
@@ -92,7 +92,6 @@ class Manager(object):
             writeLog(self.rndProcNum, 'PVR timed out', xbmc.LOGFATAL)
             notify(ADDON_NAME, LS(30032), icon=xbmcgui.NOTIFICATION_WARNING)
 
-
     @classmethod
     def createwellformedlist(cls, setting):
         """
@@ -100,14 +99,13 @@ class Manager(object):
         """
         return ' '.join(getAddonSetting(setting).replace(',', ' ').split()).split()
 
-
     def local_to_utc_datetime(self, local_datetime):
         """
         converts local datetime to datetime in utc
         :param: local_datetime as datetime object
         :return: utc_datetime as datetime object
         """
-        if local_datetime == None: return datetime.datetime.fromtimestamp(0)
+        if local_datetime is None: return datetime.datetime.fromtimestamp(0)
         return local_datetime - datetime.timedelta(seconds=TIME_OFFSET)
 
     def utc_to_local_datetime(self, utc_datetime):
@@ -116,7 +114,7 @@ class Manager(object):
         :param: utc_datetime as datetime object
         :return: loacl_datetime as datetime object
         """
-        if utc_datetime == None: return datetime.datetime.fromtimestamp(0)
+        if utc_datetime is None: return datetime.datetime.fromtimestamp(0)
         return utc_datetime + datetime.timedelta(seconds=TIME_OFFSET)
 
     def get_pvr_events(self, flags):
@@ -137,16 +135,18 @@ class Manager(object):
                 if response is not None and response.get('timers', False):
                     for timer in response.get('timers'):
                         if timer['istimerrule'] or timer['state'] == 'disabled' or \
-                                (strpTimeBug(timer['starttime'], JSON_TIME_FORMAT)  < __curTime): continue
+                                (strpTimeBug(timer['starttime'], JSON_TIME_FORMAT) < __curTime): continue
                         self.wakeREC = strpTimeBug(timer['starttime'], JSON_TIME_FORMAT) - \
-                        datetime.timedelta(minutes=timer['startmargin'])
+                                       datetime.timedelta(minutes=timer['startmargin'])
                         if (self.wakeREC - __curTime).seconds < \
                                 (getAddonSetting('margin_start', sType=NUM) + getAddonSetting('margin_stop', sType=NUM)):
                             flags |= isREC
-                            writeLog(self.rndProcNum, 'Next recording starts in %s secs' % ((self.wakeREC - __curTime).seconds))
+                            writeLog(self.rndProcNum,
+                                     'Next recording starts in %s secs' % (self.wakeREC - __curTime).seconds)
                         else:
                             flags |= isRES
-                            writeLog(self.rndProcNum, 'No active timers yet, prepare timer@%s' % (self.wakeREC.strftime(JSON_TIME_FORMAT)))
+                            writeLog(self.rndProcNum,
+                                     'No active timers yet, prepare timer@%s' % (self.wakeREC.strftime(JSON_TIME_FORMAT)))
                         break
                 else:
                     self.wakeREC = None
@@ -160,7 +160,8 @@ class Manager(object):
             if getAddonSetting('epgtimer_interval', sType=NUM) == 1 and \
                     self.wakeEPG + datetime.timedelta(minutes=getAddonSetting('epgtimer_duration', sType=NUM)) < __curTime:
                 self.wakeEPG += datetime.timedelta(days=1)
-            if self.wakeEPG - datetime.timedelta(seconds=getAddonSetting('margin_start', sType=NUM) + getAddonSetting('margin_stop', sType=NUM)) <= \
+            if self.wakeEPG - datetime.timedelta(seconds=getAddonSetting('margin_start', sType=NUM) +
+                                                         getAddonSetting('margin_stop', sType=NUM)) <= \
                     __curTime <= self.wakeEPG + datetime.timedelta(minutes=getAddonSetting('epgtimer_duration', sType=NUM)):
                 flags |= isEPG
             else:
@@ -226,13 +227,13 @@ class Manager(object):
             # show notifications
             time4msg = self.utc_to_local_datetime(self.wakeUTC).strftime(JSON_TIME_FORMAT)
             if id4msg == 30018:
-                writeLog(self.rndProcNum, 'Wakeup for recording at %s' % (time4msg))
+                writeLog(self.rndProcNum, 'Wakeup for recording at %s' % time4msg)
                 _flags |= isREC
-                if getAddonSetting('next_schedule', sType=BOOL): notify(LS(30017), LS(id4msg) % (time4msg))
+                if getAddonSetting('next_schedule', sType=BOOL): notify(LS(30017), LS(id4msg) % time4msg)
             elif id4msg == 30019:
-                writeLog(self.rndProcNum, 'Wakeup for EPG update at %s' % (time4msg))
+                writeLog(self.rndProcNum, 'Wakeup for EPG update at %s' % time4msg)
                 _flags |= isEPG
-                if getAddonSetting('next_schedule', sType=BOOL): notify(LS(30017), LS(id4msg) % (time4msg))
+                if getAddonSetting('next_schedule', sType=BOOL): notify(LS(30017), LS(id4msg) % time4msg)
         else:
             if getAddonSetting('next_schedule', sType=BOOL): notify(LS(30010), LS(30014))
         xbmc.sleep(6000)
@@ -256,7 +257,7 @@ class Manager(object):
         if xbmc.getCondVisibility('VideoPlayer.isFullscreen'):
             writeLog(self.rndProcNum, 'Countdown possibly invisible (fullscreen mode)')
             writeLog(self.rndProcNum, 'Showing additional notification')
-            notify(LS(30010), LS(30011) % (__counter))
+            notify(LS(30010), LS(30011) % __counter)
 
         # show countdown, init KeyMonitor
 
@@ -281,7 +282,7 @@ class Manager(object):
 
             xbmc.sleep(1000)
             __idleTime += 1
-            __bar +=1
+            __bar += 1
         keymon.close()
         pb.close()
         return False
@@ -304,7 +305,7 @@ class Manager(object):
         writeLog(self.rndProcNum, 'Instruct the system to shut down using %s: %s' %
                  (SHUTDOWN_METHOD[getAddonSetting('shutdown_method', sType=NUM)],
                   SHUTDOWN_MODE[getAddonSetting('shutdown_mode', sType=NUM)]), xbmc.LOGNOTICE)
-        writeLog(self.rndProcNum, 'Wake-Up Unix timestamp: %s' % (_utc), xbmc.LOGNOTICE)
+        writeLog(self.rndProcNum, 'Wake-Up Unix timestamp: %s' % _utc, xbmc.LOGNOTICE)
         writeLog(self.rndProcNum, 'Flags on resume points will be later {0:05b}'.format(_flags))
 
         if osv['platform'] == 'Linux':
@@ -344,13 +345,13 @@ class Manager(object):
         elif mode == 'POWEROFF':
             writeLog(self.rndProcNum, 'Poweroff command received', level=xbmc.LOGNOTICE)
 
-            if (_flags & isREC):
+            if _flags & isREC:
                 notify(LS(30015), LS(30020), icon=xbmcgui.NOTIFICATION_WARNING)  # Notify 'Recording in progress'
-            elif (_flags & isEPG):
+            elif _flags & isEPG:
                 notify(LS(30015), LS(30021), icon=xbmcgui.NOTIFICATION_WARNING)  # Notify 'EPG-Update'
-            elif (_flags & isPRG):
+            elif _flags & isPRG:
                 notify(LS(30015), LS(30022), icon=xbmcgui.NOTIFICATION_WARNING)  # Notify 'Postprocessing'
-            elif (_flags & isNET):
+            elif _flags & isNET:
                 notify(LS(30015), LS(30023), icon=xbmcgui.NOTIFICATION_WARNING)  # Notify 'Network active'
             else:
                 if self.countDown(): return
