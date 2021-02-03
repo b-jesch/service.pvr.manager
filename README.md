@@ -1,7 +1,7 @@
 service.pvr.manager
 ===================
 
-Addon for 'PVR Timer- and Powermanagement' for Kodi. This addon turns your vanilla Kodi on a Linux installation (pure Linux, Kodibuntu, Open-/LibreELEC) into a full featured video recorder.
+Addon for 'PVR Timer- and Powermanagement' for Kodi on x86 based hardware. This addon turns your vanilla Kodi on a Linux installation (pure Linux, Kodibuntu, Open-/LibreELEC) into a full featured video recorder.
 
 This addon handles poweroff management for current active recordings and wakeup procedures for future schedules using the JSON-RPC-Interface of Kodi. The addon starts and shut down the htpc if a recording is scheduled. It delivers optional Emails via SMTP if an automatic scheduled Recording ended successfully.
 
@@ -10,12 +10,13 @@ The plugin starts the system periodically on an user defined cycle and time for 
 
 Some installation notes
 -----------------------
+1.	THIS ADDON WORKS ONLY ON x86 BASED HARDWARE AS IT WRITES WAKEUP INFORMATIONS INTO THE HARDWARE (BIOS) RTC. IT DOESN'T WORK ON AML NOR ARM BASED HARDWARE (ANDROID BOXES, RASPERRY)
 
-1.	YOU KNOW WHAT A TERMINAL CONSOLE IS AND YOU ARE ABLE TO USE IT.
+2.	YOU KNOW WHAT A TERMINAL CONSOLE IS AND YOU ARE ABLE TO USE IT.
 
-2.	THIS ADDON USE ACPI-WAKEUP OVER RTC. YOUR MAINBOARD MUST SUPPORT THIS PROPERLY. NOTE THAT IN YOUR APM-SETTINGS OF YOUR BOARD THE RTC WAKEUP SHOULD BE SET TO ‘by OS’ OR ‘disabled’. YOU CAN ALSO USE A SPECIAL USB REMOTE CONTROLLER 'Y.A.R.D.2'. IF THIS IS CHOOSEN, THE RTC OF Y.A.R.D.2 IS USED.
+3.	THIS ADDON USE ACPI-WAKEUP OVER RTC. YOUR MAINBOARD MUST SUPPORT THIS PROPERLY. NOTE THAT IN YOUR APM-SETTINGS OF YOUR BOARD THE RTC WAKEUP SHOULD BE SET TO ‘by OS’ OR ‘disabled’. YOU CAN ALSO USE A SPECIAL USB REMOTE CONTROLLER 'Y.A.R.D.2'. IF THIS IS CHOOSEN, THE RTC OF Y.A.R.D.2 IS USED.
 
-3.	THIS README USES ```kodi``` AS THE DEFAULT USER. IF KODI IS RUNNING WITH A DIFFERENT USERNAME, CHANGE ALL OCCURENCES OF ```/home/kodi/``` TO ```/home/yourusername/``` IN YOUR PATHNAMES/NAMES.
+4.	THIS README USES ```kodi``` AS THE DEFAULT USER. IF KODI IS RUNNING WITH A DIFFERENT USERNAME, CHANGE ALL OCCURENCES OF ```/home/kodi/``` TO ```/home/yourusername/``` IN YOUR PATHNAMES/NAMES.
 
 Installation
 ------------
