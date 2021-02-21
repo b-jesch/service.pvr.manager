@@ -19,7 +19,7 @@ ACTION_SELECT = 7
 osv = release()
 writeLog(None, 'OS ID is %s' % (osv['osid']))
 
-if ('libreelec' or 'openelec' or 'coreelec') in osv['osid'].lower() and getAddonSetting('sudo', sType=BOOL):
+if ('libreelec' or 'openelec') in osv['osid'].lower() and getAddonSetting('sudo', sType=BOOL):
     ADDON.setSetting('sudo', 'false')
     writeLog(None, 'Reset wrong setting \'sudo\' to False')
 
@@ -77,8 +77,10 @@ class Manager(object):
 
         # PVR server
 
-        notify(ADDON_NAME, LS(30027), icon=xbmcgui.NOTIFICATION_INFO, dispTime=3000)
-        xbmc.sleep(3000)
+    def checkPvrPresence(self, mode=None):
+        if mode is None:
+            notify(ADDON_NAME, LS(30027), icon=xbmcgui.NOTIFICATION_INFO, dispTime=3000)
+            xbmc.sleep(3000)
         _attempts = getAddonSetting('conn_attempts', sType=NUM, multiplicator=5)
         while not self.hasPVR and _attempts > 0:
             query = {'method': 'PVR.GetProperties',
@@ -143,7 +145,7 @@ class Manager(object):
                         if (self.wakeREC - __curTime).seconds < \
                                 (getAddonSetting('margin_start', sType=NUM) + getAddonSetting('margin_stop', sType=NUM)):
                             flags |= isREC
-                            writeLog(self.rndProcNum, 'Next recording starts in %s secs' % ((self.wakeREC - __curTime).seconds))
+                            writeLog(self.rndProcNum, 'Next recording starts in %s secs' % (self.wakeREC - __curTime).seconds)
                         else:
                             flags |= isRES
                             writeLog(self.rndProcNum, 'No active timers yet, prepare timer@%s' % (self.wakeREC.strftime(JSON_TIME_FORMAT)))
@@ -308,11 +310,16 @@ class Manager(object):
         writeLog(self.rndProcNum, 'Flags on resume points will be later {0:05b}'.format(_flags))
 
         if osv['platform'] == 'Linux':
-            sudo = 'sudo ' if getAddonSetting('sudo', sType=BOOL) else ''
-            os.system('%s%s %s %s %s' % (sudo, SHUTDOWN_CMD, _utc,
-                                         getAddonSetting('shutdown_method', sType=NUM),
-                                         getAddonSetting('shutdown_mode', sType=NUM)))
-        if getAddonSetting('shutdown_method', sType=NUM) == 0 or osv['platform'] == 'Windows': xbmc.shutdown()
+            if getAddonSetting('shutdown_method', sType=NUM) == 0:
+                xbmc.shutdown()
+            else:
+                sudo = 'sudo ' if getAddonSetting('sudo', sType=BOOL) else ''
+                os.system('%s%s %s %s %s' % (sudo, SHUTDOWN_CMD, _utc,
+                                             getAddonSetting('shutdown_method', sType=NUM),
+                                             getAddonSetting('shutdown_mode', sType=NUM)))
+        elif osv['platform'] == 'Windows':
+            xbmc.shutdown()
+
         xbmc.sleep(1000)
 
         # If we suspend instead of poweroff the system, we need the flags to control the main loop of the service.
@@ -326,6 +333,7 @@ class Manager(object):
     def start(self, mode=None):
 
         writeLog(self.rndProcNum, 'Starting service with id:%s@mode:%s' % (self.rndProcNum, mode))
+        self.checkPvrPresence(mode)
         _flags = self.getSysState()
 
         if mode is None:
@@ -344,19 +352,19 @@ class Manager(object):
         elif mode == 'POWEROFF':
             writeLog(self.rndProcNum, 'Poweroff command received', level=xbmc.LOGINFO)
 
-            if (_flags & isREC):
+            if _flags & isREC:
                 notify(LS(30015), LS(30020), icon=xbmcgui.NOTIFICATION_WARNING)  # Notify 'Recording in progress'
-            elif (_flags & isEPG):
+            elif _flags & isEPG:
                 notify(LS(30015), LS(30021), icon=xbmcgui.NOTIFICATION_WARNING)  # Notify 'EPG-Update'
-            elif (_flags & isPRG):
+            elif _flags & isPRG:
                 notify(LS(30015), LS(30022), icon=xbmcgui.NOTIFICATION_WARNING)  # Notify 'Postprocessing'
-            elif (_flags & isNET):
+            elif _flags & isNET:
                 notify(LS(30015), LS(30023), icon=xbmcgui.NOTIFICATION_WARNING)  # Notify 'Network active'
             else:
                 if self.countDown(): return
                 _flags = self.setWakeup()
         else:
-            writeLog(self.rndProcNum, 'unknown parameter %s' % (mode), xbmc.LOGFATAL)
+            writeLog(self.rndProcNum, 'unknown parameter %s' % mode, xbmc.LOGFATAL)
             return
 
         # RESUME POINT #1
@@ -385,7 +393,7 @@ class Manager(object):
                     writeLog(self.rndProcNum, _comm.stdout.readline().strip())
 
                 writeLog(self.rndProcNum, 'external EPG grabber script tooks %s seconds' %
-                         ((datetime.datetime.now() - _start).seconds))
+                         (datetime.datetime.now() - _start).seconds)
             except Exception:
                 writeLog(self.rndProcNum, 'Could not start external EPG grabber script', xbmc.LOGERROR)
 
@@ -462,6 +470,7 @@ class Manager(object):
         ##################################### END OF MAIN SERVICE #####################################
 
 # mode translations
+
 
 if __name__ == '__main__':
     mode = None
