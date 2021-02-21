@@ -51,11 +51,11 @@ Installation
             <global>
                 <!-- This is the keyboard section -->
                 <keyboard>
-                    <f12>XBMC.RunScript(service.pvr.manager,poweroff)</f12>
+                    <f12>RunScript(service.pvr.manager,poweroff)</f12>
                 </keyboard>
                 <!-- This is the remote section -->
                 <remote>
-                    <power>XBMC.RunScript(service.pvr.manager,poweroff)</power>
+                    <power>RunScript(service.pvr.manager,poweroff)</power>
                 </remote>
             </global>
         </keymap>
