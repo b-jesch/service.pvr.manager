@@ -3,6 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="f55da56c-bbe2-459d-86c8-2bf5a2962867" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/language/resource.language.de_de/strings.po" beforeDir="false" afterPath="$PROJECT_DIR$/resources/language/resource.language.de_de/strings.po" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/language/resource.language.en_gb/strings.po" beforeDir="false" afterPath="$PROJECT_DIR$/resources/language/resource.language.en_gb/strings.po" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,6 +43,10 @@
       <updated>1613902669459</updated>
       <workItem from="1613902670703" duration="2424000" />
       <workItem from="1613918667082" duration="297000" />
+      <workItem from="1613934386971" duration="664000" />
+      <workItem from="1613936641099" duration="6000" />
+      <workItem from="1613941518013" duration="648000" />
+      <workItem from="1614275123153" duration="843000" />
     </task>
     <task id="LOCAL-00001" summary="smaller bugfixes">
       <created>1613903632311</created>
@@ -49,7 +55,14 @@
       <option name="project" value="LOCAL" />
       <updated>1613903632311</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Error in README.md fixed">
+      <created>1613934566071</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1613934566071</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -57,6 +70,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="smaller bugfixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="smaller bugfixes" />
+    <MESSAGE value="Error in README.md fixed" />
+    <option name="LAST_COMMIT_MESSAGE" value="Error in README.md fixed" />
   </component>
 </project>
