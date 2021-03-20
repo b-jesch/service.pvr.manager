@@ -310,13 +310,12 @@ class Manager(object):
         writeLog(self.rndProcNum, 'Flags on resume points will be later {0:05b}'.format(_flags))
 
         if osv['platform'] == 'Linux':
+            sudo = 'sudo ' if getAddonSetting('sudo', sType=BOOL) else ''
+            os.system('%s%s %s %s %s' % (sudo, SHUTDOWN_CMD, _utc,
+                                         getAddonSetting('shutdown_method', sType=NUM),
+                                         getAddonSetting('shutdown_mode', sType=NUM)))
             if getAddonSetting('shutdown_method', sType=NUM) == 0:
                 xbmc.shutdown()
-            else:
-                sudo = 'sudo ' if getAddonSetting('sudo', sType=BOOL) else ''
-                os.system('%s%s %s %s %s' % (sudo, SHUTDOWN_CMD, _utc,
-                                             getAddonSetting('shutdown_method', sType=NUM),
-                                             getAddonSetting('shutdown_mode', sType=NUM)))
         elif osv['platform'] == 'Windows':
             xbmc.shutdown()
 
