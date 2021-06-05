@@ -130,8 +130,8 @@ msgid "Suspend"
 msgstr "Bereitschaft"
 
 msgctxt "#30027"
-msgid "Test of PVR Server Availability"
-msgstr "Teste PVR Server Verfügbarkeit"
+msgid "Check of PVR Server Availability"
+msgstr "Überprüfe PVR Server Verfügbarkeit"
 
 msgctxt "#30030"
 msgid "Communication Error"

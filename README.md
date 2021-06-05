@@ -77,7 +77,7 @@ In this case $HOME/yard2 points to the installation folder of yard2wakeup. On *E
 ADDITIONAL FOR EXPERTS
 ----------------------
 
-If you want to add a hook to the shutdown menu of kodi (this changes the behaviour of the power button), edit the ‘DialogButtonMenu.xml’ (or similar) in the xml part of the skin addon and look for a xml tag like (note the &lt;onclick&gt;Powerdown()&lt;/onclick&gt; inside here):
+If you want to add a hook to the shutdown menu of kodi (this changes the behaviour of the power button), edit the ‘DialogButtonMenu.xml’ (or similar) in the xml part of the skin addon and look for a xml tag like (note the &lt;onclick&gt;Powerdown()&lt;/onclick&gt; inside here). <b>Note that you have to remove the `<remote>` entry</b> in the remote.xml if you choose this way:
 
         <item>
             <label>$LOCALIZE[13016]</label>

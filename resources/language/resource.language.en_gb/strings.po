@@ -130,7 +130,7 @@ msgid "Suspend"
 msgstr ""
 
 msgctxt "#30027"
-msgid "Test of PVR Server Availability"
+msgid "Check of PVR Server Availability"
 msgstr ""
 
 #empty strings from id 30027 to 30029

@@ -3,6 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="f55da56c-bbe2-459d-86c8-2bf5a2962867" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/addon.xml" beforeDir="false" afterPath="$PROJECT_DIR$/addon.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/language/resource.language.de_de/strings.po" beforeDir="false" afterPath="$PROJECT_DIR$/resources/language/resource.language.de_de/strings.po" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/language/resource.language.en_gb/strings.po" beforeDir="false" afterPath="$PROJECT_DIR$/resources/language/resource.language.en_gb/strings.po" afterDir="false" />
     </list>
@@ -24,7 +26,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/.." />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
