@@ -9,10 +9,10 @@ import random
 TIME_OFFSET = int(round((datetime.datetime.now() - datetime.datetime.utcnow()).seconds, -1))
 JSON_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
-SHUTDOWN_CMD = xbmc.translatePath(os.path.join(PATH, 'resources', 'lib', 'shutdown.sh'))
+SHUTDOWN_CMD = xbmcvfs.translatePath(os.path.join(PATH, 'resources', 'lib', 'shutdown.sh'))
 SHUTDOWN_METHOD = [LS(30012), LS(30013), LS(30025)]
 SHUTDOWN_MODE = [LS(30006), LS(30026)]
-EXTGRABBER = xbmc.translatePath(os.path.join(PATH, 'resources', 'lib', 'epggrab_ext.sh'))
+EXTGRABBER = xbmcvfs.translatePath(os.path.join(PATH, 'resources', 'lib', 'epggrab_ext.sh'))
 
 ACTION_SELECT = 7
 
@@ -109,7 +109,7 @@ class Manager(object):
         :param: local_datetime as datetime object
         :return: utc_datetime as datetime object
         """
-        if local_datetime == None: return datetime.datetime.fromtimestamp(0)
+        if local_datetime is None: return datetime.datetime.fromtimestamp(0)
         return local_datetime - datetime.timedelta(seconds=TIME_OFFSET)
 
     def utc_to_local_datetime(self, utc_datetime):
@@ -118,7 +118,7 @@ class Manager(object):
         :param: utc_datetime as datetime object
         :return: loacl_datetime as datetime object
         """
-        if utc_datetime == None: return datetime.datetime.fromtimestamp(0)
+        if utc_datetime is None: return datetime.datetime.fromtimestamp(0)
         return utc_datetime + datetime.timedelta(seconds=TIME_OFFSET)
 
     def get_pvr_events(self, flags):
@@ -228,13 +228,13 @@ class Manager(object):
             # show notifications
             time4msg = self.utc_to_local_datetime(self.wakeUTC).strftime(JSON_TIME_FORMAT)
             if id4msg == 30018:
-                writeLog(self.rndProcNum, 'Wakeup for recording at %s' % (time4msg))
+                writeLog(self.rndProcNum, 'Wakeup for recording at %s' % time4msg)
                 _flags |= isREC
-                if getAddonSetting('next_schedule', sType=BOOL): notify(LS(30017), LS(id4msg) % (time4msg))
+                if getAddonSetting('next_schedule', sType=BOOL): notify(LS(30017), LS(id4msg) % time4msg)
             elif id4msg == 30019:
-                writeLog(self.rndProcNum, 'Wakeup for EPG update at %s' % (time4msg))
+                writeLog(self.rndProcNum, 'Wakeup for EPG update at %s' % time4msg)
                 _flags |= isEPG
-                if getAddonSetting('next_schedule', sType=BOOL): notify(LS(30017), LS(id4msg) % (time4msg))
+                if getAddonSetting('next_schedule', sType=BOOL): notify(LS(30017), LS(id4msg) % time4msg)
         else:
             if getAddonSetting('next_schedule', sType=BOOL): notify(LS(30010), LS(30014))
         xbmc.sleep(6000)
@@ -258,7 +258,7 @@ class Manager(object):
         if xbmc.getCondVisibility('VideoPlayer.isFullscreen'):
             writeLog(self.rndProcNum, 'Countdown possibly invisible (fullscreen mode)')
             writeLog(self.rndProcNum, 'Showing additional notification')
-            notify(LS(30010), LS(30011) % (__counter))
+            notify(LS(30010), LS(30011) % __counter)
 
         # show countdown, init KeyMonitor
 
@@ -306,7 +306,7 @@ class Manager(object):
         writeLog(self.rndProcNum, 'Instruct the system to shut down using %s: %s' %
                  (SHUTDOWN_METHOD[getAddonSetting('shutdown_method', sType=NUM)],
                   SHUTDOWN_MODE[getAddonSetting('shutdown_mode', sType=NUM)]), xbmc.LOGINFO)
-        writeLog(self.rndProcNum, 'Wake-Up Unix timestamp: %s' % (_utc), xbmc.LOGINFO)
+        writeLog(self.rndProcNum, 'Wake-Up Unix timestamp: %s' % _utc, xbmc.LOGINFO)
         writeLog(self.rndProcNum, 'Flags on resume points will be later {0:05b}'.format(_flags))
 
         if osv['platform'] == 'Linux':
@@ -380,12 +380,12 @@ class Manager(object):
             #
             # ToDo: implement startup of external script (epg grabbing)
             #
-            _epgpath = xbmc.translatePath(os.path.join(getAddonSetting('epg_path'), 'epg.xml'))
+            _epgpath = xbmcvfs.translatePath(os.path.join(getAddonSetting('epg_path'), 'epg.xml'))
             if getAddonSetting('store_epg', sType=BOOL) and _epgpath == '': _epgpath = '/dev/null'
             _start = datetime.datetime.now()
             try:
                 _comm = subprocess.Popen('%s %s %s' % (EXTGRABBER, _epgpath,
-                                                       xbmc.translatePath(getAddonSetting('epg_socket_path'))),
+                                                       xbmcvfs.translatePath(getAddonSetting('epg_socket_path'))),
                                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                          shell=True, universal_newlines=True)
                 while _comm.poll() is None:

@@ -10,6 +10,7 @@ import re
 import xbmc
 import xbmcgui
 import xbmcaddon
+import xbmcvfs
 
 import smtplib
 from email.message import Message
@@ -18,7 +19,7 @@ from dateutil import parser
 ADDON = xbmcaddon.Addon()
 ADDON_NAME = ADDON.getAddonInfo('name')
 PATH = ADDON.getAddonInfo('path')
-PROFILE = xbmc.translatePath(ADDON.getAddonInfo('profile'))
+PROFILE = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
 LS = ADDON.getLocalizedString
 
 # Constants
@@ -29,7 +30,7 @@ NUM = 2
 
 def writeLog(proc, message, level=xbmc.LOGDEBUG):
     if proc is not None:
-        proc ='@%s' % (proc)
+        proc ='@%s' % proc
     else:
         proc = ''
     xbmc.log('[%s %s%s] %s' % (ADDON.getAddonInfo('id'), ADDON.getAddonInfo('version'), proc, message), level)
@@ -83,7 +84,7 @@ def jsonrpc(query):
         response = json.loads(xbmc.executeJSONRPC(json.dumps(querystring)))
         if 'result' in response: return response['result']
     except TypeError as e:
-        writeLog(None, 'Error executing JSON RPC: %s' % (e.args), xbmc.LOGFATAL)
+        writeLog(None, 'Error executing JSON RPC: %s' % e.args, xbmc.LOGFATAL)
     return None
 
 
@@ -107,7 +108,7 @@ def deliverMail(hostname, message):
             __s_msg = Message()
             __s_msg.set_charset(getAddonSetting('charset'))
             __s_msg.set_payload(message, charset=getAddonSetting('charset'))
-            __s_msg["Subject"] = LS(30046) % (hostname)
+            __s_msg["Subject"] = LS(30046) % hostname
             __s_msg["From"] = getAddonSetting('smtp_from')
             __s_msg["To"] = getAddonSetting('smtp_to')
 
